@@ -12,10 +12,10 @@ Perfetto is the successor to [`chrome://tracing`](https://slack.engineering/chro
 
 ## How to install
 
-You can grab it using git submodules:
+You can add this project as a git submodules:
 
 ```
-https://github.com/sudara/melatonin_perfetto.git
+git submodule add -b main https://github.com/sudara/melatonin_perfetto.git modules/melatonin_perfetto
 ```
 
 The CMake setup for Perfetto itself is a bit hairy, not going to lie. 
