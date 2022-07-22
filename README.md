@@ -10,18 +10,67 @@ However, it's just a way to use the amazing [Perfetto](http://perfetto.dev) perf
 
 Perfetto is the successor to [`chrome://tracing`](https://slack.engineering/chrome-tracing-for-fun-and-profit/). 
 
+## How to install
+
+You can grab it using git submodules:
+
+```
+https://github.com/sudara/melatonin_perfetto.git
+```
+
+The CMake setup for Perfetto itself is a bit hairy, not going to lie. 
+
+I had to dig deep to get it happy on MSVC. This is what my working config looks like:
+
+```
+Include(FetchContent)
+FetchContent_Declare(
+    Perfetto
+    GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
+    GIT_TAG v25.0)
+FetchContent_Populate(Perfetto)
+include_directories(${perfetto_SOURCE_DIR}/sdk)
+add_library(perfetto STATIC ${perfetto_SOURCE_DIR}/sdk/perfetto.cc)
+target_compile_definitions(perfetto PUBLIC NOMINMAX=1 WIN32_LEAN_AND_MEAN=1)
+set_target_properties(perfetto PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
+if(MSVC)
+    target_compile_options(perfetto PRIVATE "/bigobj")
+endif()
+```
+
+Then you can add this project as a JUCE module:
+
+```
+juce_add_module("modules/melatonin_perfetto")
+```
+
+Don't forget to link perfetto to your plugin target too:
+```
+target_link_libraries(YourPlugin PRIVATE Perfetto)
+```
+
+Phew. That was the hard part.
+
 ## How to use
 
-* By default, you don't want perfetto on
-* When you do, set `#define PERFETTO 1` somewhere before including the module.
+* By default, perfetto is not included or on, it's guarded by a #define.
+* When you want to profile, set `#define PERFETTO 1` (somewhere before you first include the module, as a preprocessor directive, or just toggle in the module header if you are lazy like me)
 * Pepper around `TRACE_DSP()` or `TRACE_COMPONENT()` macros in a function to add that category of event to the trace. (See below for more options).
 * Run your app
 * Quit your app and a trace file will be dumped **(Note: don't just terminate it via your IDE, the file will be only dumped on a graceful quit)**.
 * Find the trace file and drag it into https://ui.perfetto.dev
 
+You can keep the macros peppered around in your app, they are defined to do nothing when `#define PERFETTO 0`. That's handy for future you!
+
 ## Options
 
-By default, there are two categories defined. The current fuction name will be passed. You can add custom parameters if you need to further differentiate. Go wild! 
+By default, there are two "categories" defined, dsp and components. 
+
+The current fuction name is passed as the name. You can add custom parameters if you need to further differentiate. 
+
+You can also use the built in `TRACE_EVENT` which takes a name if you don't want it to derive a name based on the function.
+
+Go wild! 
 
 ```
 TRACE_DSP("startSample", startSample, "numSamples", numSamples);
