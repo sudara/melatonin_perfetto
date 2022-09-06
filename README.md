@@ -53,12 +53,25 @@ Phew. That was the hard part.
 
 ## How to use
 
-* By default, perfetto is not included or on, it's guarded by a #define.
-* When you want to profile, set `#define PERFETTO 1` (somewhere before you first include the module, as a preprocessor directive, or just toggle in the module header if you are lazy like me)
-* Pepper around `TRACE_DSP()` or `TRACE_COMPONENT()` macros in a function to add that category of event to the trace. (See below for more options).
-* Run your app
-* Quit your app and a trace file will be dumped **(Note: don't just terminate it via your IDE, the file will be only dumped on a graceful quit)**.
-* Find the trace file and drag it into https://ui.perfetto.dev
+0. Include the module
+1. Put this in PluginProcessor's constructor:
+
+```
+#if PERFETTO
+    MelatoninPerfetto::get().beginSession();
+#endif
+```
+and in your destructor:
+```
+#if PERFETTO
+    MelatoninPerfetto::get().endSession();
+#endif
+```
+3. Pepper around `TRACE_DSP()` or `TRACE_COMPONENT()` macros in a function to add that category of event to the trace. (See below for more options).
+4. When you want to profile, set `#define PERFETTO 1` (somewhere before you first include the module, as a preprocessor directive, or just toggle in the module header if you are lazy like me). That'll actually include the google lib. When it's not defined, the `TRACE_DSP` calls will be no-ops, so you can just leave them in place with no impact to your app.
+5. Run your app
+6. Quit your app and a trace file will be dumped **(Note: don't just terminate it via your IDE, the file will be only dumped on a graceful quit)**.
+7. Find the trace file and drag it into https://ui.perfetto.dev
 
 You can keep the macros peppered around in your app, they are defined to do nothing when `#define PERFETTO 0`. That's handy for future you!
 
