@@ -8,6 +8,14 @@ However, it's just a way to use the amazing [Perfetto](http://perfetto.dev) perf
 
 ## Why Perfetto?
 
+The short answer: It lets you acurately measure different parts of your code and visualize it over time.
+
+When you have performance concerns, general profiling is a great first step, and one worth famaliarizing yourself with. But it's very hand-wavey, pretty much only good for drunkenly pointing you to "the one hotspot, I think". Everything is aggregate. Everything is relative. 
+
+Perfetto lets you get down the cold hard absolute facts: which functions are take how many µs/ms. How often are those functions being called, how does it look across time.
+
+Perfetto is perfect for measuring paint calls because you can see how many times they are occur and what the timing is for each occurance. 
+
 Perfetto is the successor to [`chrome://tracing`](https://slack.engineering/chrome-tracing-for-fun-and-profit/). 
 
 ## How to install
@@ -53,7 +61,8 @@ Phew. That was the hard part.
 
 ## How to use
 
-1. Put this in PluginProcessor's constructor:
+### Add a few pieces of guarded code to your plugin
+Put this in PluginProcessor's constructor:
 
 ```
 #if PERFETTO
@@ -66,13 +75,37 @@ and in your destructor:
     MelatoninPerfetto::get().endSession();
 #endif
 ```
-3. Pepper around `TRACE_DSP()` or `TRACE_COMPONENT()` macros in a function to add that category of event to the trace. (See below for more options).
-4. When you want to profile, set `#define PERFETTO 1` (somewhere before you first include the module, as a preprocessor directive, or just toggle in the module header if you are lazy like me). That'll actually include the google lib. When it's not defined, the `TRACE_DSP` calls will be no-ops, so you can just leave them in place with no impact to your app.
-5. Run your app
-6. Quit your app and a trace file will be dumped **(Note: don't just terminate it via your IDE, the file will be only dumped on a graceful quit)**.
-7. Find the trace file and drag it into https://ui.perfetto.dev
+And as a member of the plugin processor:
+```
+#if PERFETTO
+    std::unique_ptr<perfetto::TracingSession> tracingSession;
+#endif
+```
+### Pepper around some sweet sweet macros
 
-You can keep the macros peppered around in your app, they are defined to do nothing when `#define PERFETTO 0`. That's handy for future you!
+Unlike with profiling, you'll have to opt functions in to being measured
+
+Pepper around `TRACE_DSP()` or `TRACE_COMPONENT()` macros. 
+
+Or use perfetto's raw `TRACE_EVENT()` 
+
+### Enable profiling
+
+When you want to profile, set `#define PERFETTO 1` (somewhere before you first include the module, as a preprocessor directive, or just toggle in the module header if you are lazy like me). That'll actually include the google lib. When it's not defined, the `TRACE_DSP` calls will be no-ops, so you can just leave them in place with no impact to your app.
+
+### Run your app and perform the actions you want traced
+
+When you quit your app, a trace file will be dumped 
+
+**(Note: don't just terminate it via your IDE, the file will be only dumped on a graceful quit)**.
+
+Find the trace file and drag it into https://ui.perfetto.dev
+
+### That's it
+
+You can keep the macros peppered around in your app during normal dev/release. Just remember to `#define PERFETTO 0` so everything gets turned into a no-op. 
+
+That's handy for future you!
 
 ## Options
 
