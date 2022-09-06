@@ -53,7 +53,6 @@ Phew. That was the hard part.
 
 ## How to use
 
-0. Include the module
 1. Put this in PluginProcessor's constructor:
 
 ```
