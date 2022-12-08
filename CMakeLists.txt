@@ -117,16 +117,36 @@ cpack_add_component_group (MelatoninPerfetto
 
 include (CMakePackageConfigHelpers)
 
-write_basic_package_version_file (MelatoninPerfetto-config-version.cmake
+write_basic_package_version_file (MelatoninPerfettoConfigVersion.cmake
 								  VERSION "${MelatoninPerfetto_VERSION}"
 								  COMPATIBILITY SameMajorVersion)
 
-configure_package_config_file (cmake/package_config.cmake MelatoninPerfetto-config.cmake
+configure_package_config_file (cmake/package_config.cmake MelatoninPerfettoConfig.cmake
 							   INSTALL_DESTINATION "${MP_INSTALL_DEST}"
-							   PATH_VARS MP_INSTALL_DEST)
+							   NO_SET_AND_CHECK_MACRO)
 
 install (FILES 
-			"${CMAKE_CURRENT_BINARY_DIR}/MelatoninPerfetto-config-version.cmake" 
-			"${CMAKE_CURRENT_BINARY_DIR}/MelatoninPerfetto-config.cmake"
+			"${CMAKE_CURRENT_BINARY_DIR}/MelatoninPerfettoConfigVersion.cmake" 
+			"${CMAKE_CURRENT_BINARY_DIR}/MelatoninPerfettoConfig.cmake"
 		 DESTINATION "${MP_INSTALL_DEST}"
 		 COMPONENT melatonin_perfetto)
+
+#
+
+if(MelatoninPerfetto_IS_TOP_LEVEL)
+	set (test_default ON)
+else()
+	set (test_default OFF)
+endif()
+
+option (MP_TESTS "Build the melatonin_perfetto tests" "${test_default}")
+
+if(MP_TESTS)
+	enable_testing()
+
+	add_subdirectory (tests)
+
+	if(MelatoninPerfetto_IS_TOP_LEVEL)
+		include (CTest)
+	endif()
+endif()
