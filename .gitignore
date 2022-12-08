@@ -10,6 +10,7 @@ CMakeUserPresets.json
 Testing/
 [Cc]ache/
 .cache/
+[Dd]eploy/
 
 # IDE-specific files and directories
 xcuserdata/

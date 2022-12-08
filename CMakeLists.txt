@@ -6,9 +6,12 @@ project (MelatoninPerfetto
 		 DESCRIPTION "JUCE module for profiling with Perfetto"
 		 HOMEPAGE_URL "https://github.com/sudara/melatonin_perfetto")
 
+set (CMAKE_CXX_STANDARD 17)
+set (CMAKE_CXX_STANDARD_REQUIRED YES)
+
 include (GNUInstallDirs)
 
-set (MP_INSTALL_DEST "${CMAKE_INSTALL_INCLUDEDIR}/melatonin_perfetto" 
+set (MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto" 
 	 CACHE STRING 
 	 "Path below the install prefix where melatonin_perfetto package files will be installed to")
 
