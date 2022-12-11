@@ -21,12 +21,16 @@ Perfetto is the successor to [`chrome://tracing`](https://slack.engineering/chro
 
 ## Using from a CMake project
 
+### Getting the code into your project
+
 This project supports being added to CMake projects using several methods:
 - `find_package`
 - `FetchContent`
 - `add_subdirectory`
 
-### `find_package`
+Notice that in all cases, the exported target you should link against is exactly the same, `Melatonin::melatonin_perfetto`.
+
+#### `find_package`
 
 You can install this module to your system by cloning the code and then running the following commands:
 ```sh
@@ -44,27 +48,66 @@ find_package (MelatoninPerfetto)
 target_link_libraries (yourTarget PRIVATE Melatonin::melatonin_perfetto)
 ```
 
-### `FetchContent`
+#### `FetchContent`
 
 Here is an example usage:
 ```cmake
 include (FetchContent)
 
 FetchContent_Declare (melatonin_perfetto
-                      GIT_REPOSITORY https://github.com/sudara/melatonin_perfetto.git
-                      GIT_TAG origin/main)
+  GIT_REPOSITORY https://github.com/sudara/melatonin_perfetto.git
+  GIT_TAG origin/main)
 
 FetchContent_MakeAvailable (melatonin_perfetto)
 
 target_link_libraries (yourTarget PRIVATE Melatonin::melatonin_perfetto)
 ```
 
-### `add_subdirectory`
+#### `add_subdirectory`
 
-You can also add this repository as a git submodule to your project, and simply call `add_subdirectory` on it.
+You can also add this repository as a git submodule to your project:
+```sh
+git submodule add -b main https://github.com/sudara/melatonin_perfetto.git modules/melatonin_perfetto
+```
+and then simply call `add_subdirectory` on it:
+```cmake
+add_subdirectory (modules/melatonin_perfetto)
 
+target_link_libraries (yourTarget PRIVATE Melatonin::melatonin_perfetto)
+```
 
-Notice that in all cases, the exported target you should link against is exactly the same, `Melatonin::melatonin_perfetto`.
+### CMake options
+
+This module creates a CMake option, `PERFETTO`, that when `ON`, adds the `PERFETTO` symbol to the module's exported
+compile definitions. When this symbol is not defined, the various `TRACE_` macros are no-ops, so this CMake option 
+is an easy way for you to turn tracing on and off from the command line when building your project.
+
+To build your project with tracing enabled:
+```sh
+cmake -B build -D PERFETTO=ON
+```
+The value of `PERFETTO` will be saved in the CMake cache, so you don't need to re-specify this every time you re-run
+CMake configure. However, to turn it off again, you can do:
+```sh
+cmake -B build -D PERFETTO=OFF
+```
+
+The `PERFETTO` option is created by this package no matter which method you use to import it to your project.
+
+### Running the tests
+
+`melatonin_perfetto` includes a test suite using CTest. To run the tests, clone the code and run these commands:
+```sh
+cmake -B Builds
+cmake --build Builds --config Debug
+cd Builds
+ctest -C Debug
+```
+
+The tests attempt to build two minimal CMake projects that depend on the `melatonin_perfetto` module; one tests
+finding an install tree using `find_package()` and one tests calling `add_subdirectory()`. These tests serve to
+verify that this module's packaging and installation scripts are correct, and that it can be successfully imported
+to other projects using the methods advertised above.
 
 
 ## How to use
