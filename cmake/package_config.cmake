@@ -2,7 +2,9 @@
 
 include (CMakeFindDependencyMacro)
 
-find_dependency (JUCE)
+if(NOT COMMAND juce_add_module)
+	message (FATAL_ERROR "JUCE must be added to your project before you call find_package(MelatoninPerfetto)!")
+endif()
 
 include ("${CMAKE_CURRENT_LIST_DIR}/PerfettoTargets.cmake")
 

@@ -2,21 +2,13 @@ set (base_name melatonin.perfetto.add_subdirectory)
 
 set (binary_dir "${CMAKE_CURRENT_BINARY_DIR}/AddSubdirectoryTest")
 
-# we don't want to redownload the JUCE source code again in the child CMake
-if(juce_SOURCE_DIR)
-	set (juce_arg -D "juce_SOURCE_DIR=${juce_SOURCE_DIR}")
-elseif(JUCE_DIR)
-	set (juce_arg -D "JUCE_DIR=${JUCE_DIR}")
-else()
-	unset (juce_arg)
-endif()
-
 add_test (NAME "${base_name}.configure"
 		  COMMAND "${CMAKE_COMMAND}"
 		  			-S "${CMAKE_CURRENT_LIST_DIR}"
 		  			-B "${binary_dir}"
 		  			-D "MELATONIN_PERFETTO_ROOT=${MelatoninPerfetto_SOURCE_DIR}"
-		  			${juce_arg})
+		  			-D "FETCHCONTENT_SOURCE_DIR_JUCE=${juce_SOURCE_DIR}"
+		  			-D "FETCHCONTENT_SOURCE_DIR_PERFETTO=${perfetto_SOURCE_DIR}")
 
 set_tests_properties ("${base_name}.configure" PROPERTIES FIXTURES_SETUP MelatoninPerfettoAddSubdirectoryConfigure)
 

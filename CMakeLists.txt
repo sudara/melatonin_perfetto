@@ -6,6 +6,23 @@ project (MelatoninPerfetto
 		 DESCRIPTION "JUCE module for profiling with Perfetto"
 		 HOMEPAGE_URL "https://github.com/sudara/melatonin_perfetto")
 
+include (FetchContent)
+
+if(MelatoninPerfetto_IS_TOP_LEVEL)
+	FetchContent_Declare (JUCE 
+					  GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
+					  GIT_TAG origin/master
+					  GIT_SHALLOW TRUE
+					  GIT_PROGRESS TRUE
+					  FIND_PACKAGE_ARGS 7.0.3)
+
+	FetchContent_MakeAvailable (JUCE)
+endif()
+
+if(NOT COMMAND juce_add_module)
+	message (FATAL_ERROR "JUCE must be added to your project before melatonin_perfetto!")
+endif()
+
 set (CMAKE_CXX_STANDARD 17)
 set (CMAKE_CXX_STANDARD_REQUIRED YES)
 
@@ -15,22 +32,13 @@ set (MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
 	 CACHE STRING 
 	 "Path below the install prefix where melatonin_perfetto package files will be installed to")
 
-include (FetchContent)
-
-FetchContent_Declare (JUCE 
-					  GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-					  GIT_TAG origin/master
-					  GIT_SHALLOW TRUE
-					  GIT_PROGRESS TRUE
-					  FIND_PACKAGE_ARGS 7.0.3)
-
 FetchContent_Declare (Perfetto
 					  GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
 					  GIT_TAG v25.0
 					  GIT_SHALLOW TRUE
 					  GIT_PROGRESS TRUE)
 
-FetchContent_MakeAvailable (JUCE Perfetto)
+FetchContent_MakeAvailable (Perfetto)
 
 # we need to manually set up a target for Perfetto
 
