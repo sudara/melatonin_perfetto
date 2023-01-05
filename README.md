@@ -107,7 +107,8 @@ ctest -C Debug
 The tests attempt to build two minimal CMake projects that depend on the `melatonin_perfetto` module; one tests
 finding an install tree using `find_package()` and one tests calling `add_subdirectory()`. These tests serve to
 verify that this module's packaging and installation scripts are correct, and that it can be successfully imported
-to other projects using the methods advertised above.
+to other projects using the methods advertised above. Another test case verifies that attempting to configure a 
+project that adds `melatonin_perfetto` before JUCE will fail with the proper error message.
 
 
 ## How to use

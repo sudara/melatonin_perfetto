@@ -6,6 +6,8 @@ project (MelatoninPerfetto
 		 DESCRIPTION "JUCE module for profiling with Perfetto"
 		 HOMEPAGE_URL "https://github.com/sudara/melatonin_perfetto")
 
+set (missing_juce_error_message "JUCE must be added to your project before melatonin_perfetto!")
+
 include (FetchContent)
 
 if(MelatoninPerfetto_IS_TOP_LEVEL)
@@ -20,7 +22,7 @@ if(MelatoninPerfetto_IS_TOP_LEVEL)
 endif()
 
 if(NOT COMMAND juce_add_module)
-	message (FATAL_ERROR "JUCE must be added to your project before melatonin_perfetto!")
+	message (FATAL_ERROR "${missing_juce_error_message}")
 endif()
 
 set (CMAKE_CXX_STANDARD 17)
@@ -142,13 +144,7 @@ install (FILES
 
 #
 
-if(MelatoninPerfetto_IS_TOP_LEVEL)
-	set (test_default ON)
-else()
-	set (test_default OFF)
-endif()
-
-option (MP_TESTS "Build the melatonin_perfetto tests" "${test_default}")
+option (MP_TESTS "Build the melatonin_perfetto tests" "${MelatoninPerfetto_IS_TOP_LEVEL}")
 
 if(MP_TESTS)
 	enable_testing()
