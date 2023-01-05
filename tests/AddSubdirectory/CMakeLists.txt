@@ -23,4 +23,4 @@ juce_add_console_app (test VERSION 1.0.0)
 
 target_sources (test PRIVATE main.cpp)
 
-target_link_libraries (test PRIVATE Melatonin::melatonin_perfetto)
+target_link_libraries (test PRIVATE Melatonin::Perfetto)

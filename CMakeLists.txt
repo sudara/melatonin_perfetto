@@ -94,8 +94,7 @@ cpack_add_component (perfetto
 
 #
 
-juce_add_module ("${CMAKE_CURRENT_LIST_DIR}/melatonin_perfetto"
-				 ALIAS_NAMESPACE Melatonin)
+juce_add_module ("${CMAKE_CURRENT_LIST_DIR}/melatonin_perfetto")
 
 target_link_libraries (melatonin_perfetto INTERFACE perfetto::perfetto)
 
@@ -104,6 +103,8 @@ option (PERFETTO "Enable Perfetto tracing using the melatonin_perfetto module" O
 if(PERFETTO)
 	target_compile_definitions (melatonin_perfetto INTERFACE PERFETTO=1)
 endif()
+
+add_library (Melatonin::Perfetto ALIAS melatonin_perfetto)
 
 install (DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/melatonin_perfetto"
 		 DESTINATION "${MP_INSTALL_DEST}"

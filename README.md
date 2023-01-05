@@ -28,7 +28,7 @@ This project supports being added to CMake projects using several methods:
 - `FetchContent`
 - `add_subdirectory`
 
-Notice that in all cases, the exported target you should link against is exactly the same, `Melatonin::melatonin_perfetto`.
+Notice that in all cases, the exported target you should link against is exactly the same, `Melatonin::Perfetto`.
 
 #### `find_package`
 
@@ -45,7 +45,7 @@ Once this module is installed to your system, you can simply add to your CMake p
 ```cmake
 find_package (MelatoninPerfetto)
 
-target_link_libraries (yourTarget PRIVATE Melatonin::melatonin_perfetto)
+target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
 ```
 
 #### `FetchContent`
@@ -60,7 +60,7 @@ FetchContent_Declare (melatonin_perfetto
 
 FetchContent_MakeAvailable (melatonin_perfetto)
 
-target_link_libraries (yourTarget PRIVATE Melatonin::melatonin_perfetto)
+target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
 ```
 
 #### `add_subdirectory`
@@ -73,7 +73,7 @@ and then simply call `add_subdirectory` on it:
 ```cmake
 add_subdirectory (modules/melatonin_perfetto)
 
-target_link_libraries (yourTarget PRIVATE Melatonin::melatonin_perfetto)
+target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
 ```
 
 ### CMake options
