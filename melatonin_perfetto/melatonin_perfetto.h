@@ -20,10 +20,10 @@ END_JUCE_MODULE_DECLARATION
 
 #if PERFETTO
 
-    #include "juce_core/juce_core.h"
+    #include <juce_core/juce_core.h>
+    #include <perfetto.h>
     #include <chrono>
     #include <fstream>
-    #include <perfetto.h>
     #include <thread>
 
 PERFETTO_DEFINE_CATEGORIES (
@@ -95,10 +95,14 @@ private:
 
     std::unique_ptr<perfetto::TracingSession> session;
 };
+
     #define TRACE_DSP(...) TRACE_EVENT ("dsp", PERFETTO_DEBUG_FUNCTION_IDENTIFIER(), ##__VA_ARGS__)
     #define TRACE_COMPONENT(...) TRACE_EVENT ("component", PERFETTO_DEBUG_FUNCTION_IDENTIFIER(), ##__VA_ARGS__)
-#else
+
+#else // if PERFETTO
+
     #define TRACE_EVENT(category, ...)
     #define TRACE_DSP(...)
     #define TRACE_COMPONENT(...)
+
 #endif

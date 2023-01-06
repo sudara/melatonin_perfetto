@@ -18,46 +18,98 @@ Perfetto is perfect for measuring paint calls because you can see how many times
 
 Perfetto is the successor to [`chrome://tracing`](https://slack.engineering/chrome-tracing-for-fun-and-profit/). 
 
-## How to install
 
-You can add this project as a git submodules:
+## Using from a CMake project
 
+### Getting the code into your project
+
+This project supports being added to CMake projects using several methods:
+- `find_package`
+- `FetchContent`
+- `add_subdirectory`
+
+Notice that in all cases, the exported target you should link against is exactly the same, `Melatonin::Perfetto`.
+
+#### `find_package`
+
+You can install this module to your system by cloning the code and then running the following commands:
+```sh
+cmake -B Builds
+cmake --build Builds
+cmake --install Builds
 ```
+
+The `--install` command will write to system directories, so it may require `sudo`.
+
+Once this module is installed to your system, you can simply add to your CMake project:
+```cmake
+find_package (MelatoninPerfetto)
+
+target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
+```
+
+#### `FetchContent`
+
+Here is an example usage:
+```cmake
+include (FetchContent)
+
+FetchContent_Declare (melatonin_perfetto
+  GIT_REPOSITORY https://github.com/sudara/melatonin_perfetto.git
+  GIT_TAG origin/main)
+
+FetchContent_MakeAvailable (melatonin_perfetto)
+
+target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
+```
+
+#### `add_subdirectory`
+
+You can also add this repository as a git submodule to your project:
+```sh
 git submodule add -b main https://github.com/sudara/melatonin_perfetto.git modules/melatonin_perfetto
 ```
+and then simply call `add_subdirectory` on it:
+```cmake
+add_subdirectory (modules/melatonin_perfetto)
 
-The CMake setup for Perfetto itself is a bit hairy, not going to lie. 
-
-I had to dig deep to get it happy on MSVC. This is what my working config looks like:
-
-```
-Include(FetchContent)
-FetchContent_Declare(
-    Perfetto
-    GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
-    GIT_TAG v25.0)
-FetchContent_Populate(Perfetto)
-include_directories(${perfetto_SOURCE_DIR}/sdk)
-add_library(perfetto STATIC ${perfetto_SOURCE_DIR}/sdk/perfetto.cc)
-target_compile_definitions(perfetto PUBLIC NOMINMAX=1 WIN32_LEAN_AND_MEAN=1)
-set_target_properties(perfetto PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
-if(MSVC)
-    target_compile_options(perfetto PRIVATE "/bigobj")
-endif()
+target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
 ```
 
-Then you can add this project as a JUCE module:
+### CMake options
 
+This module creates a CMake option, `PERFETTO`, that when `ON`, adds the `PERFETTO` symbol to the module's exported
+compile definitions. When this symbol is not defined, the various `TRACE_` macros are no-ops, so this CMake option 
+is an easy way for you to turn tracing on and off from the command line when building your project.
+
+To build your project with tracing enabled:
+```sh
+cmake -B build -D PERFETTO=ON
 ```
-juce_add_module("modules/melatonin_perfetto")
+The value of `PERFETTO` will be saved in the CMake cache, so you don't need to re-specify this every time you re-run
+CMake configure. However, to turn it off again, you can do:
+```sh
+cmake -B build -D PERFETTO=OFF
 ```
 
-Don't forget to link perfetto to your plugin target too:
-```
-target_link_libraries(YourPlugin PRIVATE Perfetto)
+The `PERFETTO` option is created by this package no matter which method you use to import it to your project.
+
+### Running the tests
+
+`melatonin_perfetto` includes a test suite using CTest. To run the tests, clone the code and run these commands:
+```sh
+cmake -B Builds
+cmake --build Builds --config Debug
+cd Builds
+ctest -C Debug
 ```
 
-Phew. That was the hard part.
+The tests attempt to build two minimal CMake projects that depend on the `melatonin_perfetto` module; one tests
+finding an install tree using `find_package()` and one tests calling `add_subdirectory()`. These tests serve to
+verify that this module's packaging and installation scripts are correct, and that it can be successfully imported
+to other projects using the methods advertised above. Another test case verifies that attempting to configure a 
+project that adds `melatonin_perfetto` before JUCE will fail with the proper error message.
+
 
 ## How to use
 
