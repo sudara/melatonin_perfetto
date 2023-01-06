@@ -147,7 +147,9 @@ To turn it off again, you can do:
 cmake -B build -D PERFETTO=OFF
 ```
 
-You can add this as a CMake option in your IDE:
+You can add this as a CMake option in your IDE build settings, for example in CLion:
+
+<img width="254" alt="CLion - 2023-01-07 06@2x" src="https://user-images.githubusercontent.com/472/211118287-0a3cd6bb-84e3-430b-a7d4-34474e51e42d.png">
 
 
 Aaaaand if you are lazy like Sudara sometimes is, you can just edit melatonin_perfetto and change the default to `PERFETTO=1`...
@@ -251,6 +253,8 @@ TEST_CASE ("Perfetto not accidentally left enabled", "[perfetto]")
 ```
 
 If you use perfetto regularly, you can also do what I do and check for `PERFETTO` in your plugin editor and display something in the UI:
+
+<img width="384" alt="AudioPluginHost - 2023-01-06 44@2x" src="https://user-images.githubusercontent.com/472/211118327-e984f359-4e2f-4aec-8b4d-991093b36e67.png">
 
 ## Running Melatonin::Perfetto's tests
 
