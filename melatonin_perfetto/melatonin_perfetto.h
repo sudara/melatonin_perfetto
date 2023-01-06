@@ -100,7 +100,8 @@ private:
     #define TRACE_COMPONENT(...) TRACE_EVENT ("component", PERFETTO_DEBUG_FUNCTION_IDENTIFIER(), ##__VA_ARGS__)
 
 #else // if PERFETTO
-
+    #define TRACE_EVENT_BEGIN(category, ...)
+    #define TRACE_EVENT_END(category)
     #define TRACE_EVENT(category, ...)
     #define TRACE_DSP(...)
     #define TRACE_COMPONENT(...)
