@@ -87,8 +87,14 @@ private:
     #else
         auto file = juce::File::getSpecialLocation (juce::File::SpecialLocationType::userHomeDirectory).getChildFile ("Downloads");
     #endif
+
+    #if JUCE_DEBUG
+        auto mode = juce::String("-DEBUG-");
+    #else
+        auto mode = juce::String("-RELEASE-");
+    #endif
         auto currentTime = juce::Time::getCurrentTime().formatted ("%Y-%m-%d_%H%M");
-        auto output = file.getChildFile ("perfetto-" + currentTime + ".pftrace").createOutputStream();
+        auto output = file.getChildFile ("perfetto" + mode + currentTime + ".pftrace").createOutputStream();
         output->setPosition (0);
         output->write (&trace_data[0], trace_data.size() * sizeof (char));
     }
