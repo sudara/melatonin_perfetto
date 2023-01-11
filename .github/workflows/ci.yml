@@ -29,8 +29,6 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Linux
-            os: ubuntu-latest
           - name: macOS
             os: macos-latest
           - name: Windows
@@ -47,13 +45,6 @@ jobs:
         uses: jwlawson/actions-setup-cmake@65b272e1213f99771fbba0c237e0b3312270e0c9   # pin@v1.13
         with:
           cmake-version: 3.24.x
-
-      - name: Install JUCE dependencies
-        if: runner.os == 'Linux'
-        run: |
-          sudo apt-get update
-          sudo apt install libasound2-dev libx11-dev libxinerama-dev libxext-dev libfreetype6-dev libwebkit2gtk-4.0-dev libglu1-mesa-dev xvfb fluxbox ninja-build
-          sudo /usr/bin/Xvfb $DISPLAY &
 
       - name: Run CMake
         run: cmake -B build
