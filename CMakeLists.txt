@@ -36,7 +36,7 @@ set(MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
 
 FetchContent_Declare(Perfetto
         GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
-        GIT_TAG v25.0
+        GIT_TAG v31.0
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE)
 
