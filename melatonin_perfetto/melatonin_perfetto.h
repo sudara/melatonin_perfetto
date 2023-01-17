@@ -13,7 +13,7 @@ END_JUCE_MODULE_DECLARATION
 */
 
 #ifndef PERFETTO
-    #define PERFETTO 0
+    #define PERFETTO 1
 #endif
 
 #pragma once
@@ -89,9 +89,9 @@ private:
     #endif
 
     #if JUCE_DEBUG
-        auto mode = juce::String("-DEBUG-");
+        auto mode = juce::String ("-DEBUG-");
     #else
-        auto mode = juce::String("-RELEASE-");
+        auto mode = juce::String ("-RELEASE-");
     #endif
         auto currentTime = juce::Time::getCurrentTime().formatted ("%Y-%m-%d_%H%M");
         auto output = file.getChildFile ("perfetto" + mode + currentTime + ".pftrace").createOutputStream();
@@ -102,8 +102,50 @@ private:
     std::unique_ptr<perfetto::TracingSession> session;
 };
 
-    #define TRACE_DSP(...) TRACE_EVENT ("dsp", PERFETTO_DEBUG_FUNCTION_IDENTIFIER(), ##__VA_ARGS__)
-    #define TRACE_COMPONENT(...) TRACE_EVENT ("component", PERFETTO_DEBUG_FUNCTION_IDENTIFIER(), ##__VA_ARGS__)
+    /* https://stackoverflow.com/a/72627251
+       Accepts an array of characters and builds a new truncated array
+
+       Without this, deriving the function name produces an ugly string such as
+            auto AudioProcessor::processBlock(juce::AudioBuffer<float> &, juce::MidiBuffer &)::(anonymous class)::operator()()::(anonymous class)::operator()(uint32_t) const
+
+       With this, we get a nice string such as
+            AudioProcessor::processBlock
+    */
+
+    // Guarantee consteval where possible (silly?)
+    #if __cplusplus >= 202002L
+        #define MELATONIN_CONSTEVAL consteval
+    #else
+        #define MELATONIN_CONSTEVAL constexpr
+    #endif
+
+template <auto N>
+MELATONIN_CONSTEVAL auto class_and_method_name (char const (&src)[N])
+{
+    std::array<char, N> res = {};
+    for (int i = 0; i < N; ++i)
+    {
+        // wait until after the return type (first space in the character)
+        if (src[i] == ' ')
+        {
+            ++i; // skip the space
+            int j = 0; // keep track of our source string
+
+            // build result, stop when we hit the arguments
+            while ((src[i] != '('))
+            {
+                res[j] = src[i];
+                ++i; // increment character in source
+                ++j; // increment character in result
+            }
+            return res;
+        }
+    }
+    return res;
+}
+
+    #define TRACE_DSP(...) TRACE_EVENT ("dsp", perfetto::StaticString (class_and_method_name (PERFETTO_DEBUG_FUNCTION_IDENTIFIER()).data()), ##__VA_ARGS__)
+    #define TRACE_COMPONENT(...) TRACE_EVENT ("component", perfetto::StaticString (class_and_method_name (PERFETTO_DEBUG_FUNCTION_IDENTIFIER()).data()), ##__VA_ARGS__)
 
 #else // if PERFETTO
     #define TRACE_EVENT_BEGIN(category, ...)
