@@ -1,0 +1,56 @@
+name: CI
+
+on:
+  workflow_dispatch:
+  push:
+
+concurrency:
+  group: ${{ github.workflow }}.${{ github.ref }}
+  cancel-in-progress: true
+
+defaults:
+  run:
+    shell: bash
+
+permissions:
+  contents: read
+
+jobs:
+
+  BuildAndTest:
+
+    name: ${{ matrix.name }}
+
+    runs-on: ${{ matrix.os }}
+
+    timeout-minutes: 30
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: macOS
+            os: macos-latest
+          - name: Windows
+            os: windows-latest
+
+    steps:
+
+      - name: Checkout code
+        uses: actions/checkout@ac593985615ec2ede58e132d2e21d2b1cbd6127c   # pin@v3
+        with:
+          fetch-depth: 1
+
+      - name: Set up CMake
+        uses: jwlawson/actions-setup-cmake@65b272e1213f99771fbba0c237e0b3312270e0c9   # pin@v1.13
+        with:
+          cmake-version: 3.24.x
+
+      - name: Run CMake
+        run: cmake -B build
+
+      - name: Run build
+        run: cmake --build build --config Debug
+
+      - name: Run tests
+        run: cd build && ctest -C Debug
