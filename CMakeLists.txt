@@ -6,6 +6,9 @@ project(MelatoninPerfetto
         DESCRIPTION "JUCE module for profiling with Perfetto"
         HOMEPAGE_URL "https://github.com/sudara/melatonin_perfetto")
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+
 set(missing_juce_error_message "JUCE must be added to your project before melatonin_perfetto!")
 
 include(FetchContent)
@@ -24,9 +27,6 @@ endif ()
 if (NOT COMMAND juce_add_module)
     message(FATAL_ERROR "${missing_juce_error_message}")
 endif ()
-
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED YES)
 
 include(GNUInstallDirs)
 
