@@ -121,8 +121,6 @@ cpack_add_component_group(MelatoninPerfetto
         DESCRIPTION "The melatonin_perfetto JUCE module and the Perfetto library itself"
         BOLD_TITLE)
 
-#
-
 include(CMakePackageConfigHelpers)
 
 write_basic_package_version_file(MelatoninPerfettoConfigVersion.cmake
