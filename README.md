@@ -1,4 +1,6 @@
-## Melatonin Perfetto
+# Melatonin Perfetto
+
+[![](https://github.com/sudara/melatonin_perfetto/workflows/CI/badge.svg)](https://github.com/sudara/melatonin_perfetto/actions)
 
 Sounds like an ice cream flavor (albeit a sleepy one).
 
