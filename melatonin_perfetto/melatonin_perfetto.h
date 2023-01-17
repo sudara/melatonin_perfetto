@@ -13,7 +13,7 @@ END_JUCE_MODULE_DECLARATION
 */
 
 #ifndef PERFETTO
-    #define PERFETTO 1
+    #define PERFETTO 0
 #endif
 
 #pragma once
