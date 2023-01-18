@@ -50,7 +50,7 @@ jobs:
           cmake-version: 3.24.x
 
       - name: Run CMake
-        run: cmake -B build
+        run: cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON
 
       - name: Run build
         run: cmake --build build --config Debug --parallel 4
