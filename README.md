@@ -10,7 +10,7 @@ However, it's just a way to use the amazing [Perfetto](http://perfetto.dev) perf
 
 ![image-1024x396](https://user-images.githubusercontent.com/472/180338251-ce3c5814-ff9c-4fbb-a8c0-9caefc2f34dc.png)
 
-## Why Perfetto?
+## Why would I use Perfetto instead of the profiler?
 
 [Read my blog post!](melatonin.dev/blog/using-perfetto-with-juce-for-dsp-and-ui-performance-tuning)
 
