@@ -12,21 +12,7 @@ However, it's just a way to use the amazing [Perfetto](http://perfetto.dev) perf
 
 ## Why Perfetto?
 
-When you have performance concerns, normal profiling is a great first step.
-
-But profiling can be very hand-wavey. At times, it feels like all the profiler can do is drunkenly point you to "the one hotspot, I think". 
-
-Everything is aggregate. Everything is relative.
-
-Perfetto on the other hand lets you record cold hard absolute facts on a timeline:
-
-* which functions take how many µs/ms? 
-* How often are those functions being called? 
-* What order are things being called in? How does it look across time?
-
-Basically, Perfetto is *perfect* for measuring paint calls in JUCE.
-
-You can see how many times they occur and what the timing is for each call.
+[Read my blog post!](melatonin.dev/blog/using-perfetto-with-juce-for-dsp-and-ui-performance-tuning)
 
 ## Installing with CMake
 
