@@ -4,6 +4,9 @@ on:
   workflow_dispatch:
   push:
 
+env:
+  CMAKE_BUILD_PARALLEL_LEVEL: 3 # Use up to 3 cpus to build juceaide, etc
+
 concurrency:
   group: ${{ github.workflow }}.${{ github.ref }}
   cancel-in-progress: true
@@ -50,7 +53,7 @@ jobs:
         run: cmake -B build
 
       - name: Run build
-        run: cmake --build build --config Debug
+        run: cmake --build build --config Debug --parallel 4
 
       - name: Run tests
         run: cd build && ctest -C Debug

@@ -59,7 +59,7 @@ target_include_directories(perfetto PUBLIC
 
 target_compile_definitions(perfetto PUBLIC NOMINMAX=1 WIN32_LEAN_AND_MEAN=1)
 
-target_compile_features(perfetto PRIVATE cxx_std_17)
+target_compile_features(perfetto PUBLIC cxx_std_17)
 
 set_target_properties(perfetto PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
