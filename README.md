@@ -169,6 +169,34 @@ You can keep the macros peppered around in your app during normal dev/release.
 
 Just remember to set `PERFETTO` back to `0` or `OFF` so everything gets turned into a no-op. 
 
+## Installing with Projucer
+
+### Step 1: Get Perfetto SDK
+```
+git clone https://android.googlesource.com/platform/external/perfetto -b v29.0
+```
+
+### Step 2: Add path to perfetto/sdk to your project root (necessary to actually compile perfetto tracing source)
+```
+sdk/perfetto.h
+sdk/perfetto.cc
+```
+
+### Step 3: Setup Projucer - Header Search Paths:
+```
+../../perfetto/sdk //path to perfetto/sdk
+```
+
+### Step 4: Setup Projucer - Preprocessor Definitions:
+```
+PERFETTO=1 //enabled
+```
+
+### Step 5: Setup Projucer - In Mac OS exporter:
+```
+App Sandbox Options: File Access: Read/Write: Download Folder (Read/Write) // to allow perfetto to write trace files
+```
+
 ## Customizing
 
 By default, there are two perfetto "categories" defined, `dsp` and `components`. 

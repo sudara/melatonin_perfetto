@@ -94,9 +94,18 @@ private:
         auto mode = juce::String ("-RELEASE-");
     #endif
         auto currentTime = juce::Time::getCurrentTime().formatted ("%Y-%m-%d_%H%M");
-        auto output = file.getChildFile ("perfetto" + mode + currentTime + ".pftrace").createOutputStream();
-        output->setPosition (0);
-        output->write (&trace_data[0], trace_data.size() * sizeof (char));
+        auto childFile = file.getChildFile ("perfetto" + mode + currentTime + ".pftrace");
+        auto output = childFile.createOutputStream();
+        if(output) {
+            output->setPosition (0);
+            output->write (&trace_data[0], trace_data.size() * sizeof (char));
+
+            DBG("Wrote perfetto trace to: " + childFile.getFullPathName());
+        }
+        else {
+            DBG("Failed to write perfetto trace file. Check for missing permissions.");
+            jassertfalse;
+        }
     }
 
     std::unique_ptr<perfetto::TracingSession> session;
