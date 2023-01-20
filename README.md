@@ -102,7 +102,7 @@ For example for the Mac OS exporter:
 `File Access: Read/Write: Download Folder (Read/Write)` 
 ```
 
-![Projucer - 2023-01-20 54@2x](https://user-images.githubusercontent.com/472/213724719-be39512e-cda2-43cb-a589-0c3478625228.jpg)
+<img src="https://user-images.githubusercontent.com/472/213724719-be39512e-cda2-43cb-a589-0c3478625228.jpg" width="400"/>
 
 ### Step 4: Setup Projucer
 
