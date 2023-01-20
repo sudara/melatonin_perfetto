@@ -12,7 +12,7 @@ However, it's just a way to use the amazing [Perfetto](http://perfetto.dev) perf
 
 ## Why would I use Perfetto instead of the profiler?
 
-✨ 
+✨  
 ✨✨  
 ✨✨✨  
 ### [Read the blog post!](https://melatonin.dev/blog/using-perfetto-with-juce-for-dsp-and-ui-performance-tuning)
