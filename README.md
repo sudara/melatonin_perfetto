@@ -68,6 +68,48 @@ find_package (MelatoninPerfetto)
 target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
 ```
 
+## Installing with Projucer
+
+### Step 1: Download the Perfetto SDK
+
+```
+git clone https://android.googlesource.com/platform/external/perfetto -b v31.0
+```
+
+### Step 2: Add the path to perfetto/sdk to your project root 
+
+This is necessary to actually compile the perfetto tracing sdk from source.
+```
+sdk/perfetto.h
+sdk/perfetto.cc
+```
+
+### Step 3: Add Header Search Paths:
+
+```
+../../perfetto/sdk //path to perfetto/sdk
+```
+
+### Step 4: Add read/write permissions where necessary
+
+This lets perfetto write out the trace files.
+
+For example for the Mac OS exporter:
+
+```
+`File Access: Read/Write: Download Folder (Read/Write)` 
+```
+
+![Projucer - 2023-01-20 54@2x](https://user-images.githubusercontent.com/472/213724719-be39512e-cda2-43cb-a589-0c3478625228.jpg)
+
+### Step 4: Setup Projucer
+
+As you'll see in "Usage", you can now toggle traces on/off by adding the following in the exporter's preprocessor definitions:
+
+```
+PERFETTO=1 //enabled
+```
+
 ## How to use
 
 ### Step 1: Add a few pieces of guarded code to your plugin
@@ -168,34 +210,6 @@ Find the trace file and drag it into https://ui.perfetto.dev
 You can keep the macros peppered around in your app during normal dev/release. 
 
 Just remember to set `PERFETTO` back to `0` or `OFF` so everything gets turned into a no-op. 
-
-## Installing with Projucer
-
-### Step 1: Get Perfetto SDK
-```
-git clone https://android.googlesource.com/platform/external/perfetto -b v29.0
-```
-
-### Step 2: Add path to perfetto/sdk to your project root (necessary to actually compile perfetto tracing source)
-```
-sdk/perfetto.h
-sdk/perfetto.cc
-```
-
-### Step 3: Setup Projucer - Header Search Paths:
-```
-../../perfetto/sdk //path to perfetto/sdk
-```
-
-### Step 4: Setup Projucer - Preprocessor Definitions:
-```
-PERFETTO=1 //enabled
-```
-
-### Step 5: Setup Projucer - In Mac OS exporter:
-```
-App Sandbox Options: File Access: Read/Write: Download Folder (Read/Write) // to allow perfetto to write trace files
-```
 
 ## Customizing
 
