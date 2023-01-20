@@ -12,9 +12,13 @@ However, it's just a way to use the amazing [Perfetto](http://perfetto.dev) perf
 
 ## Why would I use Perfetto instead of the profiler?
 
-✨✨✨
-[Read my blog post!](https://melatonin.dev/blog/using-perfetto-with-juce-for-dsp-and-ui-performance-tuning)
-✨✨✨
+✨
+✨✨
+✨✨✨  
+### [Read the blog post!](https://melatonin.dev/blog/using-perfetto-with-juce-for-dsp-and-ui-performance-tuning)
+✨✨✨  
+✨✨
+✨
 
 ## Installing with CMake
 
@@ -74,22 +78,29 @@ target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
 
 ### Step 1: Download the Perfetto SDK
 
+It can go anywhere.
+
 ```
 git clone https://android.googlesource.com/platform/external/perfetto -b v31.0
 ```
 
-### Step 2: Add the path to perfetto/sdk to your project root 
+### Step 2: Add the path to perfetto/sdk to File Explorer
 
 This is necessary to actually compile the perfetto tracing sdk from source.
+
+In the File Explorer, hit the `+`, `Add Existing Files` and make sure the following are added:
+
 ```
 sdk/perfetto.h
 sdk/perfetto.cc
 ```
 
-### Step 3: Add Header Search Paths:
+### Step 3: Add Header Search Paths
+
+In the Exporter, tell the Projucer where to find `perfetto/sdk` folder, for example:
 
 ```
-../../perfetto/sdk //path to perfetto/sdk
+../../perfetto/sdk
 ```
 
 ### Step 4: Add read/write permissions where necessary
@@ -104,9 +115,9 @@ For example for the Mac OS exporter:
 
 <img src="https://user-images.githubusercontent.com/472/213724719-be39512e-cda2-43cb-a589-0c3478625228.jpg" width="400"/>
 
-### Step 4: Setup Projucer
+### Step 5: Enable/Disable at will
 
-As you'll see in "Usage", you can now toggle traces on/off by adding the following in the exporter's preprocessor definitions:
+As you'll see in "How to use", you can now toggle traces on/off by adding the following in the exporter's preprocessor definitions:
 
 ```
 PERFETTO=1 //enabled
