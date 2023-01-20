@@ -84,11 +84,11 @@ It can go anywhere.
 git clone https://android.googlesource.com/platform/external/perfetto -b v31.0
 ```
 
-### Step 2: Add the path to perfetto/sdk to File Explorer
+### Step 2: Add the perfetto headers in File Explorer
 
 This is necessary to actually compile the perfetto tracing sdk from source.
 
-In the File Explorer, hit the `+`, `Add Existing Files` and make sure the following are added:
+In the File Explorer, hit the `+`, `Add Existing Files` and make sure the following two are added:
 
 ```
 sdk/perfetto.h
