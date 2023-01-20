@@ -97,17 +97,19 @@ sdk/perfetto.cc
 
 ### Step 3: Add Header Search Paths
 
-In the Exporter, tell the Projucer where to find `perfetto/sdk` folder, for example:
+In the Exporter (for example Xcode macOS), tell the Projucer where to find `perfetto/sdk` folder.
+
+For example, if you downloaded it as a sibling folder to the project, you would add the following to Header Search Paths:
 
 ```
-../../perfetto/sdk
+../perfetto/sdk
 ```
 
-### Step 4: Add read/write permissions where necessary
+### Step 4: Add read/write permissions where necessary (macOS)
 
 This lets perfetto write out the trace files.
 
-For example for the Mac OS exporter:
+With `App Sandbox` enabled, you'll have to add the following:
 
 ```
 `File Access: Read/Write: Download Folder (Read/Write)` 
@@ -117,7 +119,7 @@ For example for the Mac OS exporter:
 
 ### Step 5: Enable/Disable at will
 
-As you'll see in "How to use", you can now toggle traces on/off by adding the following in the exporter's preprocessor definitions:
+As you'll see in "How to use", you can toggle perfetto traces on/off by adding the following in the exporter's preprocessor definitions:
 
 ```
 PERFETTO=1 //enabled
