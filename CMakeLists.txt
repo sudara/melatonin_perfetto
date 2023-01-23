@@ -62,7 +62,7 @@ target_compile_definitions(perfetto PUBLIC NOMINMAX=1 WIN32_LEAN_AND_MEAN=1)
 set_target_properties(perfetto PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 if (MSVC)
-    target_compile_options(perfetto PRIVATE /bigobj)
+    target_compile_options(perfetto PRIVATE /bigobj /Zc:__cplusplus)
 endif ()
 
 add_library(perfetto::perfetto ALIAS perfetto)
