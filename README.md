@@ -78,13 +78,26 @@ target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
 
 ### Step 1: Download the Perfetto SDK
 
-It can go anywhere.
+It can go anywhere. You'll actually need to use git to grab it though, there's no way to download it otherwise. Paste this into your macOS terminal (or download git on windows and use git bash):
 
 ```
 git clone https://android.googlesource.com/platform/external/perfetto -b v31.0
 ```
 
-### Step 2: Add the perfetto headers in File Explorer
+### Step 2: Download this module and add to your project
+
+Use git to add it as a submodule if you'd like stay up to date with any changes:
+
+```
+git submodule add -b main https://github.com/sudara/melatonin_perfetto.git modules/melatonin_perfetto
+```
+
+Or just download it and stick it somewhere.
+
+Be sure to add it in Projucer under "Modules".
+
+
+### Step 3: Add the perfetto headers in File Explorer
 
 This is necessary to actually compile the perfetto tracing sdk from source.
 
@@ -95,21 +108,21 @@ sdk/perfetto.h
 sdk/perfetto.cc
 ```
 
-### Step 3: Add Header Search Paths
+### Step 4: Add to your project's Header Search Paths
 
-In the Exporter (for example Xcode macOS), tell the Projucer where to find `perfetto/sdk` folder.
+In the Project Settings (gear at the top right of the sidebar), tell the Projucer where to find `perfetto/sdk` folder.
 
-For example, if you downloaded it as a sibling folder to the project, you would add the following to Header Search Paths:
+For example, if you downloaded it as a sibling folder to the project, you would add the following to `Header Search Paths`:
 
 ```
 ../perfetto/sdk
 ```
 
-### Step 4: Add read/write permissions where necessary (macOS)
+### Step 5: Add read/write permissions where necessary (macOS)
 
 This lets perfetto write out the trace files.
 
-With `App Sandbox` enabled, you'll have to add the following:
+With `App Sandbox` enabled, you'll have to enable the following:
 
 ```
 `File Access: Read/Write: Download Folder (Read/Write)` 
@@ -117,13 +130,15 @@ With `App Sandbox` enabled, you'll have to add the following:
 
 <img src="https://user-images.githubusercontent.com/472/213724719-be39512e-cda2-43cb-a589-0c3478625228.jpg" width="400"/>
 
-### Step 5: Enable/Disable at will
+### Step 6: Enable/Disable via the Projucer
 
 As you'll see in "How to use", you can toggle perfetto traces on/off by adding the following in the exporter's preprocessor definitions:
 
 ```
-PERFETTO=1 //enabled
+PERFETTO=1
 ```
+
+If that's too clunky, you can also just toggle in the source (read more below).
 
 ## How to use
 
