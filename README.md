@@ -120,13 +120,14 @@ For example, if you downloaded it as a sibling folder to the project, you would 
 
 ### Step 5: Add read/write permissions where necessary (macOS)
 
-This lets perfetto write out the trace files.
-
-With `App Sandbox` enabled, you'll have to enable the following:
+If you have `App Sandbox` enabled, you'll have to enable the following:
 
 ```
 `File Access: Read/Write: Download Folder (Read/Write)` 
 ```
+
+This lets perfetto write out the trace files.
+
 
 <img src="https://user-images.githubusercontent.com/472/213724719-be39512e-cda2-43cb-a589-0c3478625228.jpg" width="400"/>
 
