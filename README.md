@@ -1,4 +1,6 @@
-## Melatonin Perfetto
+# Melatonin Perfetto
+
+[![](https://github.com/sudara/melatonin_perfetto/workflows/CI/badge.svg)](https://github.com/sudara/melatonin_perfetto/actions)
 
 Sounds like an ice cream flavor (albeit a sleepy one).
 
@@ -8,23 +10,15 @@ However, it's just a way to use the amazing [Perfetto](http://perfetto.dev) perf
 
 ![image-1024x396](https://user-images.githubusercontent.com/472/180338251-ce3c5814-ff9c-4fbb-a8c0-9caefc2f34dc.png)
 
-## Why Perfetto?
+## Why would I use Perfetto instead of the profiler?
 
-When you have performance concerns, normal profiling is a great first step.
-
-But profiling can be very hand-wavey. At times, it feels like all the profiler can do is drunkenly point you to "the one hotspot, I think". 
-
-Everything is aggregate. Everything is relative.
-
-Perfetto on the other hand lets you record cold hard absolute facts on a timeline:
-
-* which functions take how many µs/ms? 
-* How often are those functions being called? 
-* What order are things being called in? How does it look across time?
-
-Basically, Perfetto is *perfect* for measuring paint calls in JUCE.
-
-You can see how many times they occur and what the timing is for each call.
+✨  
+✨✨  
+✨✨✨  
+### [Read the blog post!](https://melatonin.dev/blog/using-perfetto-with-juce-for-dsp-and-ui-performance-tuning)
+✨✨✨  
+✨✨  
+✨  
 
 ## Requirements
 
@@ -84,6 +78,73 @@ find_package (MelatoninPerfetto)
 
 target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
 ```
+
+## Installing with Projucer
+
+### Step 1: Download the Perfetto SDK
+
+It can go anywhere. You'll actually need to use git to grab it though, there's no way to download it otherwise. Paste this into your macOS terminal (or download git on windows and use git bash):
+
+```
+git clone https://android.googlesource.com/platform/external/perfetto -b v31.0
+```
+
+### Step 2: Download this module and add to your project
+
+Use git to add it as a submodule if you'd like stay up to date with any changes:
+
+```
+git submodule add -b main https://github.com/sudara/melatonin_perfetto.git modules/melatonin_perfetto
+```
+
+Or just download it and stick it somewhere.
+
+Be sure to add it in Projucer under "Modules".
+
+
+### Step 3: Add the perfetto headers in File Explorer
+
+This is necessary to actually compile the perfetto tracing sdk from source.
+
+In the File Explorer, hit the `+`, `Add Existing Files` and make sure the following two are added:
+
+```
+sdk/perfetto.h
+sdk/perfetto.cc
+```
+
+### Step 4: Add to your project's Header Search Paths
+
+In the Project Settings (gear at the top right of the sidebar), tell the Projucer where to find `perfetto/sdk` folder.
+
+For example, if you downloaded it as a sibling folder to the project, you would add the following to `Header Search Paths`:
+
+```
+../perfetto/sdk
+```
+
+### Step 5: Add read/write permissions where necessary (macOS)
+
+If you have `App Sandbox` enabled, you'll have to enable the following:
+
+```
+`File Access: Read/Write: Download Folder (Read/Write)` 
+```
+
+This lets perfetto write out the trace files.
+
+
+<img src="https://user-images.githubusercontent.com/472/213724719-be39512e-cda2-43cb-a589-0c3478625228.jpg" width="400"/>
+
+### Step 6: Enable/Disable via the Projucer
+
+As you'll see in "How to use", you can toggle perfetto traces on/off by adding the following in the exporter's preprocessor definitions:
+
+```
+PERFETTO=1
+```
+
+If that's too clunky, you can also just toggle in the source (read more below).
 
 ## How to use
 
