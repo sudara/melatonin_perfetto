@@ -121,25 +121,17 @@ private:
        With this, we get a nice string such as
             AudioProcessor::processBlock
     */
-
-    // Guarantee consteval where possible (silly?)
-    #if __cplusplus >= 202002L
-        #define MELATONIN_CONSTEVAL consteval
-    #else
-        #define MELATONIN_CONSTEVAL constexpr
-    #endif
-
 template <auto N>
-MELATONIN_CONSTEVAL auto class_and_method_name (char const (&src)[N])
+constexpr auto class_and_method_name (char const (&src)[N])
 {
     std::array<char, N> res = {};
-    for (int i = 0; i < N; ++i)
+    for (size_t i = 0; i < N; ++i)
     {
         // wait until after the return type (first space in the character)
         if (src[i] == ' ')
         {
             ++i; // skip the space
-            int j = 0; // keep track of our source string
+            size_t j = 0; // keep track of our source string
 
             // build result, stop when we hit the arguments
             while ((src[i] != '('))
