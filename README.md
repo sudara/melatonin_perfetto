@@ -20,6 +20,11 @@ However, it's just a way to use the amazing [Perfetto](http://perfetto.dev) perf
 ✨✨  
 ✨  
 
+## Requirements
+
+* JUCE, any version after JUCE 5 should be happy
+* C++17 (a Perfetto requirement since v31.0) 
+
 ## Installing with CMake
 
 We worked hard so you don't have to. 
@@ -166,7 +171,7 @@ and in the destructor:
     MelatoninPerfetto::get().endSession();
 #endif
 ```
-### Step 2: Pepper around some sweet sweet macros
+### Step 2: Pepper around some sweet sweet trace macros
 
 Perfetto will *only* measure functions you specifically tell it to.
 

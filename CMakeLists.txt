@@ -6,6 +6,9 @@ project(MelatoninPerfetto
         DESCRIPTION "JUCE module for profiling with Perfetto"
         HOMEPAGE_URL "https://github.com/sudara/melatonin_perfetto")
 
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED YES)
+
 set(missing_juce_error_message "JUCE must be added to your project before melatonin_perfetto!")
 
 include(FetchContent)
@@ -25,9 +28,6 @@ if (NOT COMMAND juce_add_module)
     message(FATAL_ERROR "${missing_juce_error_message}")
 endif ()
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED YES)
-
 include(GNUInstallDirs)
 
 set(MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
@@ -36,7 +36,7 @@ set(MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
 
 FetchContent_Declare(Perfetto
         GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
-        GIT_TAG v25.0
+        GIT_TAG v31.0
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE)
 
@@ -62,7 +62,7 @@ target_compile_definitions(perfetto PUBLIC NOMINMAX=1 WIN32_LEAN_AND_MEAN=1)
 set_target_properties(perfetto PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 if (MSVC)
-    target_compile_options(perfetto PRIVATE /bigobj)
+    target_compile_options(perfetto PRIVATE /bigobj /Zc:__cplusplus)
 endif ()
 
 add_library(perfetto::perfetto ALIAS perfetto)
