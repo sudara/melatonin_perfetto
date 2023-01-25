@@ -44,16 +44,5 @@ jobs:
         with:
           fetch-depth: 1
 
-      - name: Set up CMake
-        uses: jwlawson/actions-setup-cmake@65b272e1213f99771fbba0c237e0b3312270e0c9   # pin@v1.13
-        with:
-          cmake-version: 3.24.x
-
-      - name: Run CMake
-        run: cmake -B build -DCMAKE_CXX_STANDARD=17 -DCMAKE_CXX_STANDARD_REQUIRED=ON
-
-      - name: Run build
-        run: cmake --build build --config Debug --parallel 4
-
-      - name: Run tests
-        run: cd build && ctest -C Debug
+      - name: Build and test
+        run: python3 scripts/RunTests.py
