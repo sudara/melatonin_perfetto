@@ -103,6 +103,18 @@ if (PERFETTO)
     target_compile_definitions(melatonin_perfetto INTERFACE PERFETTO=1)
 endif ()
 
+if(DEFINED ENV{MP_PERFETTO_SHOULD_BE_ON})
+        if($ENV{MP_PERFETTO_SHOULD_BE_ON})
+                if(NOT PERFETTO)
+                        message (FATAL_ERROR "PERFETTO should be on, but is not!")
+                endif()
+        else()
+                if(PERFETTO)
+                        message (FATAL_ERROR "PERFETTO should be off, but is on!")
+                endif()
+        endif()
+endif()
+
 add_library(Melatonin::Perfetto ALIAS melatonin_perfetto)
 
 install(DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/melatonin_perfetto"

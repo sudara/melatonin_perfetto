@@ -10,7 +10,10 @@ add_test (NAME "${base_name}.configure"
 		  			-D "FETCHCONTENT_SOURCE_DIR_JUCE=${juce_SOURCE_DIR}"
 		  			-D "FETCHCONTENT_SOURCE_DIR_PERFETTO=${perfetto_SOURCE_DIR}")
 
-set_tests_properties ("${base_name}.configure" PROPERTIES FIXTURES_SETUP MelatoninPerfettoAddSubdirectoryConfigure)
+set_tests_properties ("${base_name}.configure" 
+						PROPERTIES 
+							FIXTURES_SETUP MelatoninPerfettoAddSubdirectoryConfigure
+							ENVIRONMENT_MODIFICATION "MP_PERFETTO_SHOULD_BE_ON=unset:")
 
 add_test (NAME "${base_name}.build"
 		  COMMAND "${CMAKE_COMMAND}"
