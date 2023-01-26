@@ -14,24 +14,24 @@ import subprocess
 
 def run_command(command, workingDir):
 
-	print (f"Running command {command}")
+    print (f"Running command {command}")
 
-	try:
-		cp = subprocess.run (command, 
-							 cwd=workingDir, 
-							 stderr=subprocess.PIPE, 
-							 stdout=subprocess.PIPE, 
-							 text=True, 
-							 shell=True,
-							 check=True)
+    try:
+        cp = subprocess.run (command, 
+                             cwd=workingDir, 
+                             stderr=subprocess.PIPE, 
+                             stdout=subprocess.PIPE, 
+                             text=True, 
+                             shell=True,
+                             check=True)
 
-		print(cp.stdout)
-		print(cp.stderr)
+        print(cp.stdout)
+        print(cp.stderr)
 
-	except subprocess.CalledProcessError as error:
-		print (error.output)
-		print (f"Command {error.cmd} failed with exit code {error.returncode}")
-		exit (1)
+    except subprocess.CalledProcessError as error:
+        print (error.output)
+        print (f"Command {error.cmd} failed with exit code {error.returncode}")
+        exit (1)
 
 #
 
@@ -40,26 +40,26 @@ REPO_ROOT = path.dirname(path.dirname(path.realpath(__file__)))
 BUILD_DIR = path.join(REPO_ROOT, "Builds")
 
 if path.isdir(BUILD_DIR):
-	rmtree (BUILD_DIR)
+    rmtree (BUILD_DIR)
 
 environ["MP_PERFETTO_SHOULD_BE_ON"] = "FALSE"
 
 run_command (command=f"cmake -B {BUILD_DIR}",
-			 workingDir=REPO_ROOT)
+             workingDir=REPO_ROOT)
 
 run_command (command=f"cmake --build {BUILD_DIR}",
-			 workingDir=REPO_ROOT)
+             workingDir=REPO_ROOT)
 
 run_command (command=f"ctest -C Debug",
-			 workingDir=BUILD_DIR)
+             workingDir=BUILD_DIR)
 
 environ["MP_PERFETTO_SHOULD_BE_ON"] = "TRUE"
 
 run_command (command=f"cmake -B {BUILD_DIR} -D PERFETTO=ON",
-			 workingDir=REPO_ROOT)
+             workingDir=REPO_ROOT)
 
 run_command (command=f"cmake --build {BUILD_DIR}",
-			 workingDir=REPO_ROOT)
+             workingDir=REPO_ROOT)
 
 run_command (command=f"ctest -C Debug",
-			 workingDir=BUILD_DIR)
+             workingDir=BUILD_DIR)
