@@ -133,6 +133,8 @@ private:
             AudioProcessor::processBlock
     */
 
+#undef MELATONIN_CONSTEVAL
+
 // Guarantee consteval where possible
 #if __cplusplus >= 202002L
     #define MELATONIN_CONSTEVAL consteval
@@ -141,19 +143,19 @@ private:
 #endif
 
 template <auto N>
-MELATONIN_CONSTEVAL auto class_and_method_name (char const (&src)[N])
+MELATONIN_CONSTEVAL auto class_and_method_name (char const (&src)[N]) noexcept
 {
     std::array<char, N> res = {};
     for (size_t i = 0; i < N; ++i)
     {
-        // wait until after the return type (first space in the character)
+        // wait until after the return type (first space in the string)
         if (src[i] == ' ')
         {
             ++i; // skip the space
-            size_t j = 0; // keep track of our source string
+            size_t j = 0;
 
             // build result, stop when we hit the arguments
-            while ((src[i] != '('))
+            while (src[i] != '(' && i < N && j < N)
             {
                 res[j] = src[i];
                 ++i; // increment character in source
@@ -164,6 +166,8 @@ MELATONIN_CONSTEVAL auto class_and_method_name (char const (&src)[N])
     }
     return res;
 }
+
+#undef MELATONIN_CONSTEVAL
 
     #define TRACE_DSP(...) TRACE_EVENT ("dsp", perfetto::StaticString (class_and_method_name (PERFETTO_DEBUG_FUNCTION_IDENTIFIER()).data()), ##__VA_ARGS__)
     #define TRACE_COMPONENT(...) TRACE_EVENT ("component", perfetto::StaticString (class_and_method_name (PERFETTO_DEBUG_FUNCTION_IDENTIFIER()).data()), ##__VA_ARGS__)
