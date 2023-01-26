@@ -43,7 +43,7 @@ FetchContent_MakeAvailable(Perfetto)
 add_library(perfetto STATIC)
 
 # set a *minimum* of C++17, but allow higher
-target_compile_features(perfetto PRIVATE cxx_std_17)
+target_compile_features(perfetto PUBLIC cxx_std_17)
 
 target_sources(perfetto
         PRIVATE
@@ -62,7 +62,9 @@ target_compile_definitions(perfetto PUBLIC NOMINMAX=1 WIN32_LEAN_AND_MEAN=1)
 set_target_properties(perfetto PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
 if (MSVC)
-    target_compile_options(perfetto PRIVATE /bigobj /Zc:__cplusplus)
+    target_compile_options(perfetto 
+        PRIVATE /bigobj 
+        PUBLIC /Zc:__cplusplus)
 endif ()
 
 add_library(perfetto::perfetto ALIAS perfetto)
