@@ -6,9 +6,6 @@ project(MelatoninPerfetto
         DESCRIPTION "JUCE module for profiling with Perfetto"
         HOMEPAGE_URL "https://github.com/sudara/melatonin_perfetto")
 
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED YES)
-
 set(missing_juce_error_message "JUCE must be added to your project before melatonin_perfetto!")
 
 include(FetchContent)
@@ -44,6 +41,9 @@ FetchContent_MakeAvailable(Perfetto)
 
 # we need to manually set up a target for Perfetto
 add_library(perfetto STATIC)
+
+# set a *minimum* of C++17, but allow higher
+target_compile_features(perfetto PRIVATE cxx_std_17)
 
 target_sources(perfetto
         PRIVATE
