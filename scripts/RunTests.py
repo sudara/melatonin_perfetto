@@ -50,7 +50,7 @@ run_command (command=f"cmake -B {BUILD_DIR}",
 run_command (command=f"cmake --build {BUILD_DIR}",
              workingDir=REPO_ROOT)
 
-run_command (command=f"ctest -C Debug",
+run_command (command="ctest -C Debug",
              workingDir=BUILD_DIR)
 
 environ["MP_PERFETTO_SHOULD_BE_ON"] = "TRUE"
@@ -61,5 +61,5 @@ run_command (command=f"cmake -B {BUILD_DIR} -D PERFETTO=ON",
 run_command (command=f"cmake --build {BUILD_DIR}",
              workingDir=REPO_ROOT)
 
-run_command (command=f"ctest -C Debug",
+run_command (command="ctest -C Debug",
              workingDir=BUILD_DIR)
