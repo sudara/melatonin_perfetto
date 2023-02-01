@@ -16,7 +16,7 @@ END_JUCE_MODULE_DECLARATION
 #pragma once
 
 #ifndef PERFETTO
-    #define PERFETTO 0
+    #define PERFETTO 1
 #endif
 
 #if PERFETTO
@@ -104,8 +104,8 @@ private:
 
         const auto currentTime = juce::Time::getCurrentTime().formatted ("%Y-%m-%d_%H%M");
         const auto childFile = file.getChildFile ("perfetto" + mode + currentTime + ".pftrace");
-        
-        if (auto output = childFile.createOutputStream()) 
+
+        if (auto output = childFile.createOutputStream())
         {
             output->setPosition (0);
             output->write (&trace_data[0], trace_data.size() * sizeof (char));
@@ -114,7 +114,7 @@ private:
 
             return childFile;
         }
-        
+
         DBG("Failed to write perfetto trace file. Check for missing permissions.");
         jassertfalse;
         return juce::File{};
