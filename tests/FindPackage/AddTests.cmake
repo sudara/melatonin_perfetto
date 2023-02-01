@@ -23,7 +23,8 @@ add_test (NAME "${base_name}.configure"
 
 set_tests_properties ("${base_name}.configure" PROPERTIES
 					  FIXTURES_SETUP MelatoninPerfettoFindPackageConfigure
-					  FIXTURES_REQUIRED MelatoninPerfettoFindPackageInstall)
+					  FIXTURES_REQUIRED MelatoninPerfettoFindPackageInstall
+					  ENVIRONMENT_MODIFICATION "MP_PERFETTO_SHOULD_BE_ON=unset:")
 
 add_test (NAME "${base_name}.build"
 		  COMMAND "${CMAKE_COMMAND}" 

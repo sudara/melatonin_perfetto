@@ -13,11 +13,11 @@ BEGIN_JUCE_MODULE_DECLARATION
 END_JUCE_MODULE_DECLARATION
 */
 
+#pragma once
+
 #ifndef PERFETTO
     #define PERFETTO 0
 #endif
-
-#pragma once
 
 #if PERFETTO
 
@@ -55,7 +55,9 @@ public:
         session->StartBlocking();
     }
 
-    void endSession()
+    // Returns the file where the dump was written to (or a null file if an error occurred)
+    // the return value can be ignored if you don't need this information
+    juce::File endSession()
     {
         // Make sure the last event is closed for this example.
         perfetto::TrackEvent::Flush();
@@ -63,7 +65,16 @@ public:
         // Stop tracing
         session->StopBlocking();
 
-        writeFile();
+        return writeFile();
+    }
+
+    static juce::File getDumpFileDirectory()
+    {
+    #if JUCE_WINDOWS
+        return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDesktopDirectory);
+    #else
+        return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userHomeDirectory).getChildFile ("Downloads");
+    #endif
     }
 
 private:
@@ -78,35 +89,35 @@ private:
         perfetto::TrackEvent::Register();
     }
 
-    void writeFile()
+    juce::File writeFile()
     {
         // Read trace data
         std::vector<char> trace_data (session->ReadTraceBlocking());
 
-    #if defined(_MSC_VER)
-        auto file = juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDesktopDirectory);
-    #else
-        auto file = juce::File::getSpecialLocation (juce::File::SpecialLocationType::userHomeDirectory).getChildFile ("Downloads");
-    #endif
+        const auto file = getDumpFileDirectory();
 
     #if JUCE_DEBUG
         auto mode = juce::String ("-DEBUG-");
     #else
         auto mode = juce::String ("-RELEASE-");
     #endif
-        auto currentTime = juce::Time::getCurrentTime().formatted ("%Y-%m-%d_%H%M");
-        auto childFile = file.getChildFile ("perfetto" + mode + currentTime + ".pftrace");
-        auto output = childFile.createOutputStream();
-        if(output) {
+
+        const auto currentTime = juce::Time::getCurrentTime().formatted ("%Y-%m-%d_%H%M");
+        const auto childFile = file.getChildFile ("perfetto" + mode + currentTime + ".pftrace");
+
+        if (auto output = childFile.createOutputStream())
+        {
             output->setPosition (0);
             output->write (&trace_data[0], trace_data.size() * sizeof (char));
 
             DBG("Wrote perfetto trace to: " + childFile.getFullPathName());
+
+            return childFile;
         }
-        else {
-            DBG("Failed to write perfetto trace file. Check for missing permissions.");
-            jassertfalse;
-        }
+
+        DBG("Failed to write perfetto trace file. Check for missing permissions.");
+        jassertfalse;
+        return juce::File{};
     }
 
     std::unique_ptr<perfetto::TracingSession> session;

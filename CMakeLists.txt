@@ -11,12 +11,14 @@ set(missing_juce_error_message "JUCE must be added to your project before melato
 include(FetchContent)
 
 if (MelatoninPerfetto_IS_TOP_LEVEL)
+    message (STATUS "Cloning JUCE...")
+
     FetchContent_Declare(JUCE
-            GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-            GIT_TAG origin/master
-            GIT_SHALLOW TRUE
-            GIT_PROGRESS TRUE
-            FIND_PACKAGE_ARGS 7.0.3)
+        GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
+        GIT_TAG origin/master
+        GIT_SHALLOW TRUE
+        GIT_PROGRESS TRUE
+        FIND_PACKAGE_ARGS 7.0.3)
 
     FetchContent_MakeAvailable(JUCE)
 endif ()
@@ -28,14 +30,14 @@ endif ()
 include(GNUInstallDirs)
 
 set(MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
-        CACHE STRING
-        "Path below the install prefix where melatonin_perfetto package files will be installed to")
+    CACHE STRING
+    "Path below the install prefix where melatonin_perfetto package files will be installed to")
 
 FetchContent_Declare(Perfetto
-        GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
-        GIT_TAG v31.0
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE)
+    GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
+    GIT_TAG v31.0
+    GIT_SHALLOW TRUE
+    GIT_PROGRESS TRUE)
 
 FetchContent_MakeAvailable(Perfetto)
 
@@ -43,26 +45,34 @@ FetchContent_MakeAvailable(Perfetto)
 add_library(perfetto STATIC)
 
 # set a *minimum* of C++17, but allow higher
-target_compile_features(perfetto PRIVATE cxx_std_17)
+target_compile_features(perfetto PUBLIC cxx_std_17)
 
 target_sources(perfetto
-        PRIVATE
+    PRIVATE
         "$<BUILD_INTERFACE:${perfetto_SOURCE_DIR}/sdk/perfetto.cc>"
-        PUBLIC
+    PUBLIC
         "$<BUILD_INTERFACE:${perfetto_SOURCE_DIR}/sdk/perfetto.h>"
         "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/perfetto/perfetto.h>"
-        )
+    )
 
 target_include_directories(perfetto PUBLIC
-        "$<BUILD_INTERFACE:${perfetto_SOURCE_DIR}/sdk>"
-        "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/perfetto>")
-
-target_compile_definitions(perfetto PUBLIC NOMINMAX=1 WIN32_LEAN_AND_MEAN=1)
+    "$<BUILD_INTERFACE:${perfetto_SOURCE_DIR}/sdk>"
+    "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}/perfetto>")
 
 set_target_properties(perfetto PROPERTIES POSITION_INDEPENDENT_CODE TRUE)
 
+if (WIN32)
+    target_compile_definitions(perfetto PUBLIC NOMINMAX=1 WIN32_LEAN_AND_MEAN=1)
+endif()
+
 if (MSVC)
-    target_compile_options(perfetto PRIVATE /bigobj /Zc:__cplusplus)
+    target_compile_options(perfetto 
+        PRIVATE 
+            /bigobj # only needed for compilation of perfetto itself
+        PUBLIC 
+            /Zc:__cplusplus # we need the correct value of the __cplusplus macro
+            /permissive- # see https://github.com/google/perfetto/issues/214
+        )
 endif ()
 
 add_library(perfetto::perfetto ALIAS perfetto)
@@ -102,6 +112,20 @@ option(PERFETTO "Enable Perfetto tracing using the melatonin_perfetto module" OF
 if (PERFETTO)
     target_compile_definitions(melatonin_perfetto INTERFACE PERFETTO=1)
 endif ()
+
+# this is an internal check related to the RunTests.py script
+# users should never worry about this environment variable!
+if(DEFINED ENV{MP_PERFETTO_SHOULD_BE_ON})
+    if($ENV{MP_PERFETTO_SHOULD_BE_ON})
+        if(NOT PERFETTO)
+            message (FATAL_ERROR "PERFETTO should be on, but is not!")
+        endif()
+    else()
+        if(PERFETTO)
+            message (FATAL_ERROR "PERFETTO should be off, but is on!")
+        endif()
+    endif()
+endif()
 
 add_library(Melatonin::Perfetto ALIAS melatonin_perfetto)
 
