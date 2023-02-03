@@ -48,7 +48,7 @@ FetchContent_MakeAvailable (melatonin_perfetto)
 target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
 ```
 
-### Option #2 submodules and `add_subdirectory`
+### Option #2: submodules and `add_subdirectory`
 
 If you are a git submodule aficionado, add this repository as a git submodule to your project:
 ```sh
@@ -61,7 +61,7 @@ add_subdirectory (modules/melatonin_perfetto)
 target_link_libraries (yourTarget PRIVATE Melatonin::Perfetto)
 ```
 
-### Option #3 Installing and using `find_package`
+### Option #3: Installing and using `find_package`
 
 Install the module to your system by cloning the code and then running the following commands:
 ```sh

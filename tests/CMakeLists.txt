@@ -5,3 +5,7 @@ include ("${CMAKE_CURRENT_LIST_DIR}/AddSubdirectory/AddTests.cmake")
 include ("${CMAKE_CURRENT_LIST_DIR}/MissingJUCE/AddTests.cmake")
 
 add_subdirectory (PerfettoValue)
+
+if(PERFETTO)
+	add_subdirectory (DumpFiles)
+endif()
