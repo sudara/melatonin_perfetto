@@ -33,6 +33,8 @@ set(MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
     CACHE STRING
     "Path below the install prefix where melatonin_perfetto package files will be installed to")
 
+message (STATUS "Cloning Perfetto...")
+
 FetchContent_Declare(Perfetto
     GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
     GIT_TAG v31.0
