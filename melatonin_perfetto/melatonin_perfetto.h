@@ -16,7 +16,7 @@ END_JUCE_MODULE_DECLARATION
 #pragma once
 
 #ifndef PERFETTO
-    #define PERFETTO 0
+    #define PERFETTO 1
 #endif
 
 #if PERFETTO
@@ -177,11 +177,19 @@ namespace melatonin
                 size_t j = 0;
 
                 // build result, stop when we hit the arguments
-                while (src[i] != '(' && i < size && j < size)
+                // clang and gcc use (, MSVC uses <
+                while ((src[i] != '(' && src[i] != '<') && i < size && j < size)
                 {
                     result[j] = src[i];
                     ++i; // increment character in source
                     ++j; // increment character in result
+                }
+
+                // ugly clean up after msvc, we want to remove the extra :: before <lambda_1>
+                if (src[i] == '<')
+                {
+                    result[j] = ' ';
+                    result[j-1] = ' ';
                 }
                 return result;
             }
@@ -215,7 +223,7 @@ namespace melatonin
         static_assert (strings_equal (compileTimePrettierFunction (WRAP_COMPILE_TIME_STRING ("void AudioProcessor::processBlock(juce::AudioBuffer<float> &, juce::MidiBuffer &)::(anonymous class)::operator()()::(anonymous class)::operator()(uint32_t) const")), "AudioProcessor::processBlock"));
 
         // msvc example
-        static_assert (strings_equal (compileTimePrettierFunction (WRAP_COMPILE_TIME_STRING ("void __cdecl AudioProcessor::processBlock(class juce::AudioBuffer<float,0,0> &,class juce::MidiBuffer &)")), "AudioProcessor::processBlock"));
+        static_assert (strings_equal (compileTimePrettierFunction (WRAP_COMPILE_TIME_STRING ("void __cdecl AudioProcessor::processBlock::<lambda_1>::operator")), "AudioProcessor::processBlock"));
     }
 }
 
