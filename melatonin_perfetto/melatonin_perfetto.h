@@ -16,7 +16,7 @@ END_JUCE_MODULE_DECLARATION
 #pragma once
 
 #ifndef PERFETTO
-    #define PERFETTO 1
+    #define PERFETTO 0
 #endif
 
 #if PERFETTO
@@ -172,7 +172,7 @@ namespace melatonin
 
                 // MSVC has an additional identifier after the return type: __cdecl
                 if (src[i + 1] == '_')
-                    i += 8; // skip the space and __cdecl
+                    i += 8; // skip __cdecl and the space afterwards
 
                 size_t j = 0;
 
