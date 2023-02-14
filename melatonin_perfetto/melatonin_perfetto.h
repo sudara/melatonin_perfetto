@@ -185,11 +185,10 @@ namespace melatonin
                     ++j; // increment character in result
                 }
 
-                // ugly clean up after msvc, we want to remove the extra :: before <lambda_1>
+                // really ugly clean up after msvc, remove the extra :: before <lambda_1>
                 if (src[i] == '<')
                 {
-                    result[j] = ' ';
-                    result[j-1] = ' ';
+                    result[j-2] = '\0';
                 }
                 return result;
             }
@@ -205,7 +204,7 @@ namespace melatonin
         {
             // sanity check
             static_assert (sizeTest > 1);
-            static_assert (sizeResult + 1 >= sizeTest);
+            static_assert (sizeResult + 1 >= sizeTest); // +1 for the /0
 
             std::string_view resultView (result.data(), sizeTest);
             std::string_view testView (test, sizeTest);
