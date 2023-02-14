@@ -3,7 +3,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
  ID:                 melatonin_perfetto
  vendor:             Sudara
- version:            1.0.0
+ version:            1.1.0
  name:               Melatonin Perfetto
  description:        Perfetto module for JUCE
  license:            MIT
