@@ -50,6 +50,11 @@ public:
         cfg.add_buffers()->set_size_kb (buffer_size_kb); // 80MB is the default
         auto* ds_cfg = cfg.add_data_sources()->mutable_config();
         ds_cfg->set_name ("track_event");
+        beginSession (cfg);
+    }
+
+    void beginSession (const perfetto::TraceConfig& cfg)
+    {
         session = perfetto::Tracing::NewTrace();
         session->Setup (cfg);
         session->StartBlocking();
