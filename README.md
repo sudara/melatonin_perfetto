@@ -296,6 +296,17 @@ Go wild!
 
 ## Troubleshooting
 
+### Perfetto gives me an error about C++17 on Windows
+
+Make sure you are passing the `/Zc:__cplusplus` flag so MSVC's version detection actually works, see [this link](https://devblogs.microsoft.com/cppblog/msvc-now-correctly-reports-__cplusplus/)
+
+In CMake:
+
+```
+target_compile_options("${PROJECT_NAME}" PUBLIC /Zc:__cplusplus)
+
+```
+
 ### I don't see a trace file
 
 Did you quit your app gracefully, such as with cmd-Q? If you instead just hit STOP on your IDE, you won't get a trace file.
