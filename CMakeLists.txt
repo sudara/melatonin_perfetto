@@ -37,7 +37,7 @@ message (STATUS "Cloning Perfetto...")
 
 FetchContent_Declare(Perfetto
     GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
-    GIT_TAG v31.0
+    GIT_TAG v33.1
     GIT_SHALLOW TRUE
     GIT_PROGRESS TRUE)
 
@@ -68,10 +68,10 @@ if (WIN32)
 endif()
 
 if (MSVC)
-    target_compile_options(perfetto 
-        PRIVATE 
+    target_compile_options(perfetto
+        PRIVATE
             /bigobj # only needed for compilation of perfetto itself
-        PUBLIC 
+        PUBLIC
             /Zc:__cplusplus # we need the correct value of the __cplusplus macro
             /permissive- # see https://github.com/google/perfetto/issues/214
         )
