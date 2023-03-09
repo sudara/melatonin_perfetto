@@ -137,11 +137,11 @@ This lets perfetto write out the trace files.
 <img src="https://user-images.githubusercontent.com/472/213724719-be39512e-cda2-43cb-a589-0c3478625228.jpg" width="400"/>
 
 
-### Step 5: Add compile options and settings (Windows)
+### Step 5: Add compile flags and preprocessor definitions (Windows)
 
 Windows Projucer builds [require some extra love](https://forum.juce.com/t/new-module-profile-your-juce-ui-dsp-performance-with-perfetto/54589/43?u=sudara).
 
-Go to the Settings page for the Visual Studio Exporter and add these to "Extra Preprocessor Definitions":
+Go to the Settings page for the Visual Studio Exporter and add these to "Extra Compile Flags":
 
 ```
 /bigobj
@@ -155,8 +155,6 @@ In addition, you'll need the following "Extra Preprocessor Definitions" set on t
 NOMINMAX=1 
 WIN32_LEAN_AND_MEAN=1
 ```
-
-
 
 ### Step 6: Enable/Disable via the Projucer
 
