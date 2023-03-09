@@ -378,5 +378,6 @@ project that adds `melatonin_perfetto` before JUCE will fail with the proper err
 
 ## Acknowledgements
 
-* Thanks to @dikadk for getting the Projucer version running on MacOS 
+* Thanks to [@benthevining](https://github.com/benthevining) for extra CMake love and tests!
+* Thanks to [@dikadk](https://github.com/dikadk) for getting a Projucer version running on MacOS 
 * Thanks to stephenk for putting in the effort to [getting the Projucer version working on Windows](https://forum.juce.com/t/new-module-profile-your-juce-ui-dsp-performance-with-perfetto/54589/43?u=sudara).
