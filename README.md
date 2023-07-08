@@ -170,6 +170,10 @@ If that's too clunky, you can also just toggle in the source (read more below).
 
 ### Step 1: Add a few pieces of guarded code to your plugin
 
+Include library:
+```cpp
+#include <melatonin_perfetto/melatonin_perfetto.h>
+```
 
 Add a member of the plugin processor:
 ```cpp
