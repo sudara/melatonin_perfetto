@@ -273,15 +273,18 @@ By default, there are two perfetto "categories" defined, `dsp` and `components`.
 
 The current function name is passed as the name. 
 
-You can add custom parameters that will show up in perfetto's UI:
+
+You can also add custom parameters that will show up in perfetto's UI:
 
 ```cpp
 TRACE_DSP("startSample", startSample, "numSamples", numSamples);
 ```
 
+### TRACE_EVENT
+
 You can also use the built in `TRACE_EVENT` which takes a name if you don't want it to derive a name based on the function.
 
-This is handy if you want to do things like have multiple traces in a function, for example in a loop.
+This is also if you want to do things like have multiple traces in a function, for example in a loop.
 
 ```cpp
     TRACE_DSP(); // start the trace, use the function name
@@ -296,7 +299,11 @@ This is handy if you want to do things like have multiple traces in a function, 
 ```
 
 
-You can also wrap code in `TRACE_EVENT_BEGIN` and `TRACE_EVENT_END`:
+### TRACE_EVENT_BEGIN and TRACE_EVENT_END
+
+Sometimes you want to go full granular and not just depend on scoping.
+
+To do this, use `TRACE_EVENT_BEGIN` and `TRACE_EVENT_END`:
 
 ```cpp
 TRACE_EVENT_BEGIN ("dsp", "memset");
@@ -305,6 +312,12 @@ temp.clear();
 TRACE_EVENT_END ("dsp");
 
 ```
+
+### "Solo" the message or audio thread
+
+If you are focusing on UI and want to temporarily rid of the audio thread in the trace, set `PERFETTO_ENABLE_TRACE_DSP=0` in your preprocessor definitions (or just modify the header like I do) and it will be a no-op.
+
+You can do the reverse and disable all UI component tracing on the message thread with `PERFETTO_ENABLE_TRACE_COMPONENT=0`.
 
 Go wild! 
 
