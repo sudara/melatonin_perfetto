@@ -131,7 +131,7 @@ endif()
 
 add_library(Melatonin::Perfetto ALIAS melatonin_perfetto)
 
-install(DIRECTORY "${CMAKE_CURRENT_LIST_DIR}/melatonin_perfetto"
+install(DIRECTORY "${CMAKE_CURRENT_LIST_DIR}"
         DESTINATION "${MP_INSTALL_DEST}"
         COMPONENT melatonin_perfetto)
 
