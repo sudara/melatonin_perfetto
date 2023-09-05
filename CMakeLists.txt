@@ -18,7 +18,7 @@ if (MelatoninPerfetto_IS_TOP_LEVEL)
         GIT_TAG origin/master
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE
-        FIND_PACKAGE_ARGS 7.0.3)
+        FIND_PACKAGE_ARGS 7.0.6)
 
     FetchContent_MakeAvailable(JUCE)
 endif ()
@@ -37,7 +37,7 @@ message (STATUS "Cloning Perfetto...")
 
 FetchContent_Declare(Perfetto
     GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
-    GIT_TAG v33.1
+    GIT_TAG v37.0
     GIT_SHALLOW TRUE
     GIT_PROGRESS TRUE)
 
@@ -105,7 +105,7 @@ cpack_add_component(perfetto
         DISPLAY_NAME "Perfetto"
         DESCRIPTION "The Perfetto profiling library")
 
-juce_add_module("${CMAKE_CURRENT_LIST_DIR}/melatonin_perfetto")
+juce_add_module("${CMAKE_CURRENT_SOURCE_DIR}")
 
 target_link_libraries(melatonin_perfetto INTERFACE perfetto::perfetto)
 
