@@ -168,6 +168,8 @@ option(MP_TESTS "Build the melatonin_perfetto tests" "${MelatoninPerfetto_IS_TOP
 if (MP_TESTS)
     enable_testing()
 
+    set(CTEST_OUTPUT_ON_FAILURE ON)
+
     add_subdirectory(tests)
 
     if (MelatoninPerfetto_IS_TOP_LEVEL)
