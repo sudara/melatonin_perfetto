@@ -22,7 +22,7 @@ FetchContent_MakeAvailable (JUCE)
 
 add_subdirectory ("${MELATONIN_PERFETTO_ROOT}" "${CMAKE_CURRENT_BINARY_DIR}/melatonin_perfetto")
 
-juce_add_console_app (test VERSION 1.0.0)
+juce_add_console_app (test NEEDS_CURL FALSE NEEDS_WEB_BROWSER FALSE)
 
 # Reduce dependencies needed in CI
 target_compile_definitions(test

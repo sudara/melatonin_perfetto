@@ -18,7 +18,7 @@ FetchContent_MakeAvailable (JUCE)
 
 find_package (MelatoninPerfetto REQUIRED)
 
-juce_add_console_app (test VERSION 1.0.0)\
+juce_add_console_app (test NEEDS_CURL FALSE NEEDS_WEB_BROWSER FALSE)
 
 # Reduce dependencies needed in CI
 target_compile_definitions(test
