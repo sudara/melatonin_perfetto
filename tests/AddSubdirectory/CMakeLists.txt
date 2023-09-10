@@ -24,6 +24,13 @@ add_subdirectory ("${MELATONIN_PERFETTO_ROOT}" "${CMAKE_CURRENT_BINARY_DIR}/mela
 
 juce_add_console_app (test VERSION 1.0.0)
 
+# Reduce dependencies needed in CI
+target_compile_definitions(test
+	JUCE_WEB_BROWSER=0
+    JUCE_USE_CURL=0
+    JUCE_VST3_CAN_REPLACE_VST2=0
+)
+
 target_sources (test PRIVATE main.cpp)
 
 target_link_libraries (test PRIVATE Melatonin::Perfetto)
