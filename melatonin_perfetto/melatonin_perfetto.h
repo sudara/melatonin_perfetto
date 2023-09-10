@@ -81,13 +81,23 @@ public:
 
     static juce::File getDumpFileDirectory()
     {
+
+        juce::File directory;
+
     #if JUCE_WINDOWS
-        return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDesktopDirectory);
+        directory = juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDesktopDirectory);
     #elif JUCE_LINUX
-        return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDocumentsDirectory);
+        directory = juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDocumentsDirectory);
     #else
-        return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userHomeDirectory).getChildFile ("Downloads");
+        directory = juce::File::getSpecialLocation (juce::File::SpecialLocationType::userHomeDirectory).getChildFile ("Downloads");
     #endif
+
+        // File an issue if this ever asserts
+        // https://github.com/sudara/melatonin_perfetto/issues/new
+        jassert(directory.isDirectory());
+
+        return directory;
+
     }
 
 private:
