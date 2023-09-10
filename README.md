@@ -265,6 +265,12 @@ The files will be dumped to the following locations:
 * Windows: Your desktop (sorry not sorry)
 * Linux: Your user's documents folder
 
+The exact file and location will be logged to `cout` (via JUCE's `DBG`) and will look like so:
+
+```
+Wrote perfetto trace to: /Users/sudara/Downloads/perfetto-DEBUG-2023-09-10_1937.pftrace
+```
+
 (I'll happily accept a PR to make this configurable.)
 
 ### Step 5: Drag the trace into Perfetto
