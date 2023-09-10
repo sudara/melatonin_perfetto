@@ -83,6 +83,8 @@ public:
     {
     #if JUCE_WINDOWS
         return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDesktopDirectory);
+    #elif JUCE_LINUX
+        return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDocumentsDirectory);
     #else
         return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userHomeDirectory).getChildFile ("Downloads");
     #endif
