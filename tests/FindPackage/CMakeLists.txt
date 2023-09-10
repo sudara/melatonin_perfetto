@@ -12,13 +12,13 @@ FetchContent_Declare (JUCE
 					  GIT_TAG origin/master
 					  GIT_SHALLOW TRUE
 					  GIT_PROGRESS TRUE
-					  FIND_PACKAGE_ARGS 7.0.3)
+					  FIND_PACKAGE_ARGS 7.0.6)
 
 FetchContent_MakeAvailable (JUCE)
 
 find_package (MelatoninPerfetto REQUIRED)
 
-juce_add_console_app (test NEEDS_CURL FALSE NEEDS_WEB_BROWSER FALSE)
+juce_add_console_app (test VERSION 1.0.0 NEEDS_CURL FALSE NEEDS_WEB_BROWSER FALSE)
 
 # Reduce dependencies needed in CI
 target_compile_definitions(test
