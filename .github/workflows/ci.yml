@@ -36,6 +36,8 @@ jobs:
             os: macos-latest
           - name: Windows
             os: windows-latest
+          - name: Linux
+            os: ubuntu-latest
 
     steps:
 
