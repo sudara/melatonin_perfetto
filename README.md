@@ -317,6 +317,17 @@ TRACE_EVENT_END ("dsp");
 
 ```
 
+### Dynamic Names
+
+Perfetto is optimized to be low overhead, shipping in RELEASE production builds. By default usage is via compile-time strings. 
+
+Working with strings dynamically introduces runtime overhead — but hey, sometimes you just want to look at something real quick. For those cases, Perfetto provides a helper:
+
+```
+TRACE_EVENT ("dsp", perfetto::DynamicString{my_dynamic_string});
+```
+
+
 ### "Solo" the message or audio thread
 
 If you are focusing on UI and want to temporarily rid of the audio thread in the trace, set `PERFETTO_ENABLE_TRACE_DSP=0` in your preprocessor definitions (or just modify the header like I do) and it will be a no-op.
