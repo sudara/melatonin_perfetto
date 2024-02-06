@@ -3,7 +3,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
  ID:                 melatonin_perfetto
  vendor:             Sudara
- version:            1.2.0
+ version:            1.3.0
  name:               Melatonin Perfetto
  description:        Perfetto module for JUCE
  license:            MIT
@@ -18,7 +18,7 @@ END_JUCE_MODULE_DECLARATION
 // I'm lazy and just toggle perfetto right here
 // But you can define it in your build system or in the file that includes this
 #ifndef PERFETTO
-    #define PERFETTO 0
+    #define PERFETTO 1
 #endif
 
 #if PERFETTO
@@ -47,12 +47,21 @@ PERFETTO_DEFINE_CATEGORIES (
 class MelatoninPerfetto
 {
 public:
-    MelatoninPerfetto (const MelatoninPerfetto&) = delete;
-
-    static MelatoninPerfetto& get()
+    MelatoninPerfetto()
     {
-        static MelatoninPerfetto instance;
-        return instance;
+        perfetto::TracingInitArgs args;
+        // The backends determine where trace events are recorded. For this example we
+        // are going to use the in-process tracing service, which only includes in-app
+        // events.
+        args.backends = perfetto::kInProcessBackend;
+        perfetto::Tracing::Initialize (args);
+        perfetto::TrackEvent::Register();
+        beginSession();
+    }
+
+    ~MelatoninPerfetto()
+    {
+        endSession();
     }
 
     void beginSession (uint32_t buffer_size_kb = 80000)
@@ -89,17 +98,6 @@ public:
     }
 
 private:
-    MelatoninPerfetto()
-    {
-        perfetto::TracingInitArgs args;
-        // The backends determine where trace events are recorded. For this example we
-        // are going to use the in-process tracing service, which only includes in-app
-        // events.
-        args.backends = perfetto::kInProcessBackend;
-        perfetto::Tracing::Initialize (args);
-        perfetto::TrackEvent::Register();
-    }
-
     juce::File writeFile()
     {
         // Read trace data
