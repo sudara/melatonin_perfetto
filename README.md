@@ -175,26 +175,15 @@ Include library:
 #include <melatonin_perfetto/melatonin_perfetto.h>
 ```
 
-Add a member of the plugin processor:
+Add a member of the plugin processor, guarded by a preprocessor definition:
 ```cpp
 #if PERFETTO
-    std::unique_ptr<perfetto::TracingSession> tracingSession;
+    MelatoninPerfetto tracingSession;
 #endif
 ```
 
-Put this in PluginProcessor's constructor:
+That's it! Earlier versions (1.2 and before) had MelatoninPerfetto as a singleton that you'd have to setup in the constructor, but now it's just a regular class. 
 
-```cpp
-#if PERFETTO
-    MelatoninPerfetto::get().beginSession();
-#endif
-```
-and in the destructor:
-```cpp
-#if PERFETTO
-    MelatoninPerfetto::get().endSession();
-#endif
-```
 ### Step 2: Pepper around some sweet sweet trace macros
 
 Perfetto will *only* measure functions you specifically tell it to.
