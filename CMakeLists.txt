@@ -35,6 +35,8 @@ set(MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
 
 message (STATUS "Cloning Perfetto...")
 
+#set(FETCHCONTENT_UPDATES_DISCONNECTED_Perfetto ON)
+
 FetchContent_Declare(Perfetto
     GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
     GIT_TAG v41.0

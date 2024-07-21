@@ -16,9 +16,9 @@ END_JUCE_MODULE_DECLARATION
 #pragma once
 
 // I'm lazy and just toggle perfetto right here
-// But you can define it in your build system or in the file that includes this
+// But you can define it in your build system or in the file that includes this header
 #ifndef PERFETTO
-    #define PERFETTO 1
+    #define PERFETTO 0
 #endif
 
 #if PERFETTO
