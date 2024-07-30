@@ -147,6 +147,7 @@ Go to the Settings page for the Visual Studio Exporter and add these to "Extra C
 /bigobj
 /Zc:__cplusplus
 /permissive-
+/Zc:externC-
 ```
 
 In addition, you'll need the following "Extra Preprocessor Definitions" set on that same page:
