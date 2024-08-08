@@ -3,7 +3,7 @@ BEGIN_JUCE_MODULE_DECLARATION
 
  ID:                 melatonin_perfetto
  vendor:             Sudara
- version:            1.3.0
+ version:            1.4.0
  name:               Melatonin Perfetto
  description:        Perfetto module for JUCE
  license:            MIT
@@ -18,7 +18,7 @@ END_JUCE_MODULE_DECLARATION
 // I'm lazy and just toggle perfetto right here
 // But you can define it in your build system or in the file that includes this header
 #ifndef PERFETTO
-    #define PERFETTO 0
+    #define PERFETTO 1
 #endif
 
 #if PERFETTO
