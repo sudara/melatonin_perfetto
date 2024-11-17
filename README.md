@@ -377,6 +377,32 @@ If you use perfetto regularly, you can also do what I do and check for `PERFETTO
 
 <img width="384" alt="AudioPluginHost - 2023-01-06 44@2x" src="https://user-images.githubusercontent.com/472/211118327-e984f359-4e2f-4aec-8b4d-991093b36e67.png">
 
+## Running Perfetto in your tests
+
+It can be really nice to run a few test cases through perfetto. 
+
+To do so with Catch2, for example, you'll need to first link against `Catch2::Catch2` instead of `Catch2::Catch2WithMain`:
+
+```
+target_link_libraries(Tests PRIVATE SharedCode Catch2::Catch2WithMain)
+```
+
+And then define your own `main` function. 
+
+```cpp
+#include "melatonin_perfetto/melatonin_perfetto.h"
+int main (int argc, char* argv[])
+{
+#if PERFETTO
+    MelatoninPerfetto perfetto;
+#endif
+
+    const int result = Catch::Session().run (argc, argv);
+
+    return result;
+}
+```
+
 ## Running Melatonin::Perfetto's tests
 
 `melatonin_perfetto` includes a test suite using CTest. To run the tests, clone the code and run these commands:

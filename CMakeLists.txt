@@ -14,11 +14,11 @@ if (MelatoninPerfetto_IS_TOP_LEVEL)
     message (STATUS "Cloning JUCE...")
 
     FetchContent_Declare(JUCE
-        GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
+        GIT_REPOSITORY https://github.com/sudara/JUCE.git
         GIT_TAG origin/master
         GIT_SHALLOW TRUE
         GIT_PROGRESS TRUE
-        FIND_PACKAGE_ARGS 7.0.9)
+        FIND_PACKAGE_ARGS develop)
 
     FetchContent_MakeAvailable(JUCE)
 endif ()

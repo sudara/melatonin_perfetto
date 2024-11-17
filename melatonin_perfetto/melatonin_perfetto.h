@@ -47,24 +47,26 @@ PERFETTO_DEFINE_CATEGORIES (
 class MelatoninPerfetto
 {
 public:
-    MelatoninPerfetto()
+    MelatoninPerfetto (bool startTrace = true) : startTraceAutomatically (startTrace)
     {
         perfetto::TracingInitArgs args;
         // The backends determine where trace events are recorded. For this example we
-        // are going to use the in-process tracing service, which only includes in-app
-        // events.
+        // are going to use the in-process tracing service, which only includes in-app events.
         args.backends = perfetto::kInProcessBackend;
         perfetto::Tracing::Initialize (args);
         perfetto::TrackEvent::Register();
-        beginSession();
+
+        if (startTraceAutomatically)
+            beginSession();
     }
 
     ~MelatoninPerfetto()
     {
-        endSession();
+        if (startTraceAutomatically)
+            endSession();
     }
 
-    void beginSession (uint32_t buffer_size_kb = 80000)
+    void beginSession (const uint32_t buffer_size_kb = 80000)
     {
         perfetto::TraceConfig cfg;
         cfg.add_buffers()->set_size_kb (buffer_size_kb); // 80MB is the default
@@ -98,6 +100,7 @@ public:
     }
 
 private:
+    bool startTraceAutomatically;
     juce::File writeFile()
     {
         // Read trace data
@@ -160,7 +163,7 @@ namespace melatonin
     {
     // if we're C++20 or higher, ensure we're compile-time
     #if __cplusplus >= 202002L
-        // This should never assert, but if so,  report it on this issue:
+        // This should never assert, but if so, report it on this issue:
         // https://github.com/sudara/melatonin_perfetto/issues/13#issue-1558171132
         if (!std::is_constant_evaluated())
             jassertfalse;
@@ -235,9 +238,8 @@ namespace melatonin
     }
 }
 
-
 #else
-    // allow people to keep perfetto helpers in-place even when disabled
+// allow people to keep perfetto helpers in-place even when disabled
     #define TRACE_EVENT_BEGIN(category, ...)
     #define TRACE_EVENT_END(category)
     #define TRACE_EVENT(category, ...)
@@ -253,6 +255,7 @@ namespace melatonin
     #define TRACE_DSP(...)                                                                                                            \
         constexpr auto pf = melatonin::compileTimePrettierFunction (WRAP_COMPILE_TIME_STRING (PERFETTO_DEBUG_FUNCTION_IDENTIFIER())); \
         TRACE_EVENT ("dsp", perfetto::StaticString (pf.data()), ##__VA_ARGS__)
+
     #define TRACE_DSP_BEGIN(name) TRACE_EVENT_BEGIN ("dsp", perfetto::StaticString (name))
     #define TRACE_DSP_END() TRACE_EVENT_END ("dsp")
 #else
@@ -265,6 +268,7 @@ namespace melatonin
     #define TRACE_COMPONENT(...)                                                                                                      \
         constexpr auto pf = melatonin::compileTimePrettierFunction (WRAP_COMPILE_TIME_STRING (PERFETTO_DEBUG_FUNCTION_IDENTIFIER())); \
         TRACE_EVENT ("component", perfetto::StaticString (pf.data()), ##__VA_ARGS__)
+
     #define TRACE_COMPONENT_BEGIN(name) TRACE_EVENT_BEGIN ("component", perfetto::StaticString (name))
     #define TRACE_COMPONENT_END() TRACE_EVENT_END ("component")
 #else
