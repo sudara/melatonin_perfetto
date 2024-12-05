@@ -8,11 +8,11 @@ project(MelatoninPerfetto
 
 set(missing_juce_error_message "JUCE must be added to your project before melatonin_perfetto!")
 
-include(CPM)
+include(cmake/CPM.cmake)
 
 if (MelatoninPerfetto_IS_TOP_LEVEL)
     message (STATUS "Grabbing JUCE...")
-    CPMAddPackage(gh:juce-framework/JUCE)
+    CPMAddPackage("gh:juce-framework/JUCE#master")
 endif ()
 
 if (NOT COMMAND juce_add_module)
