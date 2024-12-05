@@ -12,7 +12,7 @@ include(CPM)
 
 if (MelatoninPerfetto_IS_TOP_LEVEL)
     message (STATUS "Grabbing JUCE...")
-    CPMAddPackage(gh:juce-framework/JUCE@master)
+    CPMAddPackage(gh:juce-framework/JUCE)
 endif ()
 
 if (NOT COMMAND juce_add_module)
