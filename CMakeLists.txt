@@ -1,26 +1,18 @@
 cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 
 project(MelatoninPerfetto
-        VERSION 1.0.0
+        VERSION 1.1.0
         LANGUAGES CXX
         DESCRIPTION "JUCE module for profiling with Perfetto"
         HOMEPAGE_URL "https://github.com/sudara/melatonin_perfetto")
 
 set(missing_juce_error_message "JUCE must be added to your project before melatonin_perfetto!")
 
-include(FetchContent)
+include(cmake/CPM.cmake)
 
 if (MelatoninPerfetto_IS_TOP_LEVEL)
-    message (STATUS "Cloning JUCE...")
-
-    FetchContent_Declare(JUCE
-        GIT_REPOSITORY https://github.com/juce-framework/JUCE.git
-        GIT_TAG origin/master
-        GIT_SHALLOW TRUE
-        GIT_PROGRESS TRUE
-        FIND_PACKAGE_ARGS 7.0.9)
-
-    FetchContent_MakeAvailable(JUCE)
+    message (STATUS "Grabbing JUCE...")
+    CPMAddPackage("gh:juce-framework/JUCE#master")
 endif ()
 
 if (NOT COMMAND juce_add_module)
@@ -33,15 +25,8 @@ set(MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
     CACHE STRING
     "Path below the install prefix where melatonin_perfetto package files will be installed to")
 
-message (STATUS "Cloning Perfetto...")
-
-FetchContent_Declare(Perfetto
-    GIT_REPOSITORY https://android.googlesource.com/platform/external/perfetto
-    GIT_TAG v41.0
-    GIT_SHALLOW TRUE
-    GIT_PROGRESS TRUE)
-
-FetchContent_MakeAvailable(Perfetto)
+message (STATUS "Grabbing Perfetto...")
+CPMAddPackage(gh:google/perfetto@48.1)
 
 # we need to manually set up a target for Perfetto
 add_library(perfetto STATIC)
