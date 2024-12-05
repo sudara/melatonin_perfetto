@@ -176,26 +176,15 @@ Include library:
 #include <melatonin_perfetto/melatonin_perfetto.h>
 ```
 
-Add a member of the plugin processor:
+Add a member of the plugin processor, guarded by a preprocessor definition:
 ```cpp
 #if PERFETTO
-    std::unique_ptr<perfetto::TracingSession> tracingSession;
+    MelatoninPerfetto tracingSession;
 #endif
 ```
 
-Put this in PluginProcessor's constructor:
+That's it! Earlier versions (1.2 and before) had MelatoninPerfetto as a singleton that you'd have to setup in the constructor, but now it's just a regular class. 
 
-```cpp
-#if PERFETTO
-    MelatoninPerfetto::get().beginSession();
-#endif
-```
-and in the destructor:
-```cpp
-#if PERFETTO
-    MelatoninPerfetto::get().endSession();
-#endif
-```
 ### Step 2: Pepper around some sweet sweet trace macros
 
 Perfetto will *only* measure functions you specifically tell it to.
@@ -388,6 +377,32 @@ TEST_CASE ("Perfetto not accidentally left enabled", "[perfetto]")
 If you use perfetto regularly, you can also do what I do and check for `PERFETTO` in your plugin editor and display something in the UI:
 
 <img width="384" alt="AudioPluginHost - 2023-01-06 44@2x" src="https://user-images.githubusercontent.com/472/211118327-e984f359-4e2f-4aec-8b4d-991093b36e67.png">
+
+## Running Perfetto in your tests
+
+It can be really nice to run a few test cases through perfetto. 
+
+To do so with Catch2, for example, you'll need to first link against `Catch2::Catch2` instead of `Catch2::Catch2WithMain`:
+
+```
+target_link_libraries(Tests PRIVATE SharedCode Catch2::Catch2WithMain)
+```
+
+And then define your own `main` function. 
+
+```cpp
+#include "melatonin_perfetto/melatonin_perfetto.h"
+int main (int argc, char* argv[])
+{
+#if PERFETTO
+    MelatoninPerfetto perfetto;
+#endif
+
+    const int result = Catch::Session().run (argc, argv);
+
+    return result;
+}
+```
 
 ## Running Melatonin::Perfetto's tests
 

@@ -25,6 +25,7 @@ set(MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
     CACHE STRING
     "Path below the install prefix where melatonin_perfetto package files will be installed to")
 
+
 message (STATUS "Grabbing Perfetto...")
 CPMAddPackage(gh:google/perfetto@48.1)
 
