@@ -27,7 +27,7 @@ set(MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
 
 
 message (STATUS "Grabbing Perfetto...")
-CPMAddPackage(gh:google/perfetto@48.1)
+CPMAddPackage(gh:google/perfetto@50.1)
 
 # we need to manually set up a target for Perfetto
 add_library(perfetto STATIC)
