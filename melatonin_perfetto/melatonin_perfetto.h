@@ -47,7 +47,7 @@ PERFETTO_DEFINE_CATEGORIES (
 class MelatoninPerfetto
 {
 public:
-    MelatoninPerfetto (bool startTrace = true) : startTraceAutomatically (startTrace)
+    explicit MelatoninPerfetto (const bool startTrace = true) : startTraceAutomatically (startTrace)
     {
         perfetto::TracingInitArgs args;
         // The backends determine where trace events are recorded. For this example we
@@ -62,7 +62,7 @@ public:
 
     ~MelatoninPerfetto()
     {
-        if (startTraceAutomatically)
+        if (started)
             endSession();
     }
 
@@ -75,6 +75,7 @@ public:
         session = perfetto::Tracing::NewTrace();
         session->Setup (cfg);
         session->StartBlocking();
+        started = true;
     }
 
     // Returns the file where the dump was written to (or a null file if an error occurred)
@@ -86,7 +87,7 @@ public:
 
         // Stop tracing
         session->StopBlocking();
-
+        started = false;
         return writeFile();
     }
 
@@ -101,6 +102,7 @@ public:
 
 private:
     bool startTraceAutomatically;
+    bool started = true;
     juce::File writeFile()
     {
         // Read trace data

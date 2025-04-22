@@ -23,9 +23,7 @@ int szudzikPair (int a, int b)
 
 int main (int, char**)
 {
-	std::unique_ptr<perfetto::TracingSession> tracingSession;
-
-	MelatoninPerfetto::get().beginSession();
+	MelatoninPerfetto tracingSession;
 
 	auto& rand = juce::Random::getSystemRandom();
 
@@ -35,7 +33,7 @@ int main (int, char**)
 	for (auto i = 0; i < 100; ++i)
 		values.push_back (szudzikPair (rand.nextInt(), rand.nextInt()));
 
-	const auto dumpFile = MelatoninPerfetto::get().endSession();
+	const auto dumpFile = tracingSession.endSession();
 
 	if (dumpFile.existsAsFile())
 		return EXIT_SUCCESS;
