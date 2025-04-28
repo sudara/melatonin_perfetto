@@ -251,7 +251,21 @@ Start your app and perform the actions you want traced.
 
 When you quit your app, a trace file will be dumped 
 
-**(Note: don't just terminate it via your IDE, the file will be only dumped on a graceful quit)**.
+**(Note: don't just terminate it via your IDE, the file will  *only* be written on a graceful quit)**.
+
+The files will be dumped to the following locations:
+
+* macOS: Your user's downloads folder
+* Windows: Your desktop (sorry not sorry)
+* Linux: Your user's documents folder
+
+The exact file and location will be logged to `cout` (via JUCE's `DBG`) and will look like so:
+
+```
+Wrote perfetto trace to: /Users/sudara/Downloads/perfetto-DEBUG-2023-09-10_1937.pftrace
+```
+
+(I'll happily accept a PR to make this configurable.)
 
 ### Step 5: Drag the trace into Perfetto
 
@@ -329,7 +343,8 @@ Go wild!
 
 ## Assumptions / Caveats
 
-* On Mac, the trace is dumped to your Downloads folder. On Windows, it's dumped to your Desktop (sorry not sorry).
+* The location of the dump files are hardcoded at the moment! See [Step 4](#step-4-run-your-app) for locations. 
+
 * Traces are set to in memory, 80MB by default.
 
 ## Troubleshooting
@@ -347,7 +362,9 @@ target_compile_options("${PROJECT_NAME}" PUBLIC /Zc:__cplusplus)
 
 ### I don't see a trace file
 
-Did you quit your app gracefully, such as with cmd-Q? If you instead just hit STOP on your IDE, you won't get a trace file.
+Did you quit your app gracefully such as with cmd-Q? 
+
+If you instead just hit STOP on your IDE, you won't get a trace file.
 
 ### My traces appear empty
 
