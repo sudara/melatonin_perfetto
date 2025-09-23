@@ -102,7 +102,7 @@ public:
 
 private:
     bool startTraceAutomatically;
-    bool started = true;
+    bool started = false;
     juce::File writeFile()
     {
         // Read trace data
