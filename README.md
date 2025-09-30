@@ -351,13 +351,18 @@ Did you quit your app gracefully, such as with cmd-Q? If you instead just hit ST
 
 ### My traces appear empty
 
-You probably went over the memory size that Perfetto is set to use by default (80MB). 
+1. Memory size
 
-If you are doing intensive profiling with lots of functions being called many times, you'll probably want to increase this limit. You can do this by passing the number of `kb` you want to `beginSession`:
+    The memory size that Perfetto is set to use by default is 80MB. 
+    If you are doing intensive profiling with lots of functions being called many times, you'll probably want to increase this limit. You can do this by passing the number of `kb` you want to `beginSession`:
+    
+    ```
+    MelatoninPerfetto::get().beginSession(300000); # 300MB
+    ```
 
-```
-MelatoninPerfetto::get().beginSession(300000); # 300MB
-```
+2. Architecture 
+   
+   If you are on arm, try changing the target architecture in your cmake options: `-DCMAKE_OSX_ARCHITECTURES="x86_64"`
 
 ### I keep forgetting to turn perfetto off!
 
