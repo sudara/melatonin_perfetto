@@ -20,7 +20,8 @@ set_tests_properties ("${base_name}.configure"
 add_test (NAME "${base_name}.build"
 		  COMMAND "${CMAKE_COMMAND}"
 		  			--build "${binary_dir}"
-		  			--config "$<CONFIG>")
+		  			--config "$<CONFIG>"
+		  			--parallel)
 
 set_tests_properties ("${base_name}.build" PROPERTIES FIXTURES_REQUIRED MelatoninPerfettoAddSubdirectoryConfigure)
 

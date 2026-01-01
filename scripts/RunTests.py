@@ -48,24 +48,32 @@ environ["MP_PERFETTO_SHOULD_BE_ON"] = "FALSE"
 
 # Single-config generators (Unix Makefiles, Ninja) require CMAKE_BUILD_TYPE at configure time
 # Multi-config generators (Xcode, Visual Studio) ignore it and use --config at build time
-build_type_flag = "" if platform.system() == "Windows" else " -DCMAKE_BUILD_TYPE=Debug"
+if platform.system() == "Windows":
+    build_type_flag = ""
+    generator_flag = ""
+elif platform.system() == "Linux":
+    build_type_flag = " -DCMAKE_BUILD_TYPE=Debug"
+    generator_flag = " -G Ninja"  # Ninja is faster and installed in CI
+else:
+    build_type_flag = " -DCMAKE_BUILD_TYPE=Debug"
+    generator_flag = ""
 
-run_command (command=f"cmake -B {BUILD_DIR}{build_type_flag}",
+run_command (command=f"cmake -B {BUILD_DIR}{generator_flag}{build_type_flag}",
              workingDir=REPO_ROOT)
 
-run_command (command=f"cmake --build {BUILD_DIR}",
+run_command (command=f"cmake --build {BUILD_DIR} --parallel",
              workingDir=REPO_ROOT)
 
-run_command (command="ctest -C Debug --output-on-failure",
+run_command (command="ctest -C Debug -j --output-on-failure",
              workingDir=BUILD_DIR)
 
 environ["MP_PERFETTO_SHOULD_BE_ON"] = "TRUE"
 
-run_command (command=f"cmake -B {BUILD_DIR} -D PERFETTO=ON{build_type_flag}",
+run_command (command=f"cmake -B {BUILD_DIR} -D PERFETTO=ON{generator_flag}{build_type_flag}",
              workingDir=REPO_ROOT)
 
-run_command (command=f"cmake --build {BUILD_DIR}",
+run_command (command=f"cmake --build {BUILD_DIR} --parallel",
              workingDir=REPO_ROOT)
 
-run_command (command="ctest -C Debug --output-on-failure",
+run_command (command="ctest -C Debug -j --output-on-failure",
              workingDir=BUILD_DIR)
