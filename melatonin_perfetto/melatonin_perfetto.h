@@ -256,7 +256,7 @@ namespace melatonin
 #if PERFETTO_ENABLE_TRACE_DSP
     #define TRACE_DSP(...)                                                                                                            \
         static constexpr auto pf = melatonin::compileTimePrettierFunction (WRAP_COMPILE_TIME_STRING (PERFETTO_DEBUG_FUNCTION_IDENTIFIER())); \
-        TRACE_EVENT ("dsp", perfetto::StaticString (pf.data()), ##__VA_ARGS__)
+        TRACE_EVENT ("dsp", perfetto::StaticString (pf.data()) __VA_OPT__(,) __VA_ARGS__)
 
     #define TRACE_DSP_BEGIN(name) TRACE_EVENT_BEGIN ("dsp", perfetto::StaticString (name))
     #define TRACE_DSP_END() TRACE_EVENT_END ("dsp")
@@ -269,7 +269,7 @@ namespace melatonin
 #if PERFETTO_ENABLE_TRACE_COMPONENT
     #define TRACE_COMPONENT(...)                                                                                                      \
         static constexpr auto pf = melatonin::compileTimePrettierFunction (WRAP_COMPILE_TIME_STRING (PERFETTO_DEBUG_FUNCTION_IDENTIFIER())); \
-        TRACE_EVENT ("component", perfetto::StaticString (pf.data()), ##__VA_ARGS__)
+        TRACE_EVENT ("component", perfetto::StaticString (pf.data()) __VA_OPT__(,) __VA_ARGS__)
 
     #define TRACE_COMPONENT_BEGIN(name) TRACE_EVENT_BEGIN ("component", perfetto::StaticString (name))
     #define TRACE_COMPONENT_END() TRACE_EVENT_END ("component")
