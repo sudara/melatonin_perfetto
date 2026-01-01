@@ -17,6 +17,7 @@ add_test (NAME "${base_name}.configure"
 		  			-S "${CMAKE_CURRENT_LIST_DIR}"
 		  			-B "${binary_dir}"
 		  			-G "${CMAKE_GENERATOR}"
+		  			-D "CMAKE_BUILD_TYPE=${CMAKE_BUILD_TYPE}"
 		  			-D "MelatoninPerfetto_DIR=${prefix}/${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
 		  			-D "FETCHCONTENT_SOURCE_DIR_JUCE=${juce_SOURCE_DIR}"
 		  			-D "FETCHCONTENT_SOURCE_DIR_PERFETTO=${perfetto_SOURCE_DIR}")
