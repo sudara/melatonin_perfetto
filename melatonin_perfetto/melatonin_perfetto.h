@@ -95,8 +95,11 @@ public:
     {
     #if JUCE_WINDOWS
         return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDesktopDirectory);
-    #else
+    #elif JUCE_MAC || JUCE_IOS
         return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userHomeDirectory).getChildFile ("Downloads");
+    #else
+        // Linux: use temp directory for CI compatibility (no desktop/Downloads on headless systems)
+        return juce::File::getSpecialLocation (juce::File::SpecialLocationType::tempDirectory);
     #endif
     }
 

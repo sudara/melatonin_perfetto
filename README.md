@@ -329,7 +329,7 @@ Go wild!
 
 ## Assumptions / Caveats
 
-* On Mac, the trace is dumped to your Downloads folder. On Windows, it's dumped to your Desktop (sorry not sorry).
+* On Mac, the trace is dumped to your Downloads folder. On Windows, it's dumped to your Desktop. On Linux, it's dumped to the temp directory (`/tmp`).
 * Traces are set to in memory, 80MB by default.
 
 ## Troubleshooting
