@@ -59,6 +59,7 @@ if (MSVC)
             /bigobj # only needed for compilation of perfetto itself
         PUBLIC
             /Zc:__cplusplus # we need the correct value of the __cplusplus macro
+            /Zc:preprocessor # needed for __VA_OPT__(,) support
             /permissive- # see https://github.com/google/perfetto/issues/214
         )
 endif ()
