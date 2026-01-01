@@ -30,7 +30,8 @@ def run_command(command, workingDir):
         print(cp.stderr)
 
     except subprocess.CalledProcessError as error:
-        print (error.output)
+        print("STDOUT:", error.stdout)
+        print("STDERR:", error.stderr)
         print (f"Command {error.cmd} failed with exit code {error.returncode}")
         exit (1)
 
@@ -55,7 +56,7 @@ run_command (command=f"cmake -B {BUILD_DIR}{build_type_flag}",
 run_command (command=f"cmake --build {BUILD_DIR}",
              workingDir=REPO_ROOT)
 
-run_command (command="ctest -C Debug",
+run_command (command="ctest -C Debug --output-on-failure",
              workingDir=BUILD_DIR)
 
 environ["MP_PERFETTO_SHOULD_BE_ON"] = "TRUE"
@@ -66,5 +67,5 @@ run_command (command=f"cmake -B {BUILD_DIR} -D PERFETTO=ON{build_type_flag}",
 run_command (command=f"cmake --build {BUILD_DIR}",
              workingDir=REPO_ROOT)
 
-run_command (command="ctest -C Debug",
+run_command (command="ctest -C Debug --output-on-failure",
              workingDir=BUILD_DIR)
