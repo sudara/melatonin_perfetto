@@ -6,6 +6,8 @@ else()
 	target_sources (PerfettoValueTest PRIVATE should_be_off.cpp)
 endif()
 
+target_compile_definitions (PerfettoValueTest PRIVATE JUCE_USE_CURL=0)
+
 target_link_libraries (PerfettoValueTest PRIVATE Melatonin::Perfetto)
 
 add_test (NAME melatonin.perfetto.PERFETTO_symbol_value
