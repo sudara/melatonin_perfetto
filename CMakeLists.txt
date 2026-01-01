@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.24 FATAL_ERROR)
 
 project(MelatoninPerfetto
-        VERSION 1.3.0
+        VERSION 1.4.0
         LANGUAGES CXX
         DESCRIPTION "JUCE module for profiling with Perfetto"
         HOMEPAGE_URL "https://github.com/sudara/melatonin_perfetto")
@@ -27,7 +27,7 @@ set(MP_INSTALL_DEST "${CMAKE_INSTALL_LIBDIR}/cmake/melatonin_perfetto"
 
 
 message (STATUS "Grabbing Perfetto...")
-CPMAddPackage(gh:google/perfetto@51.2)
+CPMAddPackage(gh:google/perfetto@53.0)
 
 # we need to manually set up a target for Perfetto
 add_library(perfetto STATIC)
