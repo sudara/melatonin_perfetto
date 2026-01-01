@@ -26,4 +26,6 @@ juce_add_console_app (test VERSION 1.0.0)
 
 target_sources (test PRIVATE main.cpp)
 
+target_compile_definitions (test PRIVATE JUCE_USE_CURL=0)
+
 target_link_libraries (test PRIVATE Melatonin::Perfetto)
