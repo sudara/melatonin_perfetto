@@ -23,7 +23,8 @@ However, it's just a way to use the amazing [Perfetto](http://perfetto.dev) perf
 ## Requirements
 
 * JUCE, any version after JUCE 5 should be happy
-* C++17 (a Perfetto requirement since v31.0) 
+* C++17 (a Perfetto requirement since v31.0)
+* On macOS, 10.14 is the minimum build target (Perfetto uses `os_signpost` APIs introduced in Mojave) 
 
 ## Installing with CMake
 
