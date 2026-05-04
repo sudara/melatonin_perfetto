@@ -335,14 +335,15 @@ namespace melatonin
 
     #define TRACE_COMPONENT_BEGIN(name) TRACE_EVENT_BEGIN ("component", perfetto::StaticString (name))
     #define TRACE_COMPONENT_END() TRACE_EVENT_END ("component")
-#else
-    #define TRACE_COMPONENT(...)
-    #define TRACE_COMPONENT_BEGIN(name)
-    #define TRACE_COMPONENT_END()
 
     /**
      * Tracks an instant event, which shows up as an arrow on a separate "Global Events" track in the Perfetto UI.
      * @param name Describe the event - this is what shows up in the trace.
      */
     #define TRACE_COMPONENT_GLOBAL_INSTANT(name) TRACE_GLOBAL_INSTANT ("component", perfetto::StaticString (name))
+#else
+    #define TRACE_COMPONENT(...)
+    #define TRACE_COMPONENT_BEGIN(name)
+    #define TRACE_COMPONENT_END()
+    #define TRACE_COMPONENT_GLOBAL_INSTANT(name)
 #endif
