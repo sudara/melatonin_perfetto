@@ -45,6 +45,14 @@ PERFETTO_DEFINE_CATEGORIES (
     perfetto::Category ("dsp")
         .SetDescription ("dsp"));
 
+static constexpr std::uint64_t melatoninGlobalEventTrackId = 0xE1A70515;
+
+    /**
+     * Tracks an instant event, which shows up as an arrow on a separate "Global Events" track in the Perfetto UI.
+     * @param name Describe the event - this is what shows up in the trace.
+     */
+    #define TRACE_GLOBAL_INSTANT(cat, desc) TRACE_EVENT_INSTANT (cat, desc, perfetto::Track (melatoninGlobalEventTrackId));
+
 class MelatoninPerfetto
 {
 public:
@@ -66,6 +74,7 @@ public:
         args.backends = perfetto::kInProcessBackend;
         perfetto::Tracing::Initialize (args);
         perfetto::TrackEvent::Register();
+        registerGlobalEventTrack();
 
         if (startTraceAutomatically)
             beginSession();
@@ -138,6 +147,14 @@ private:
     std::unique_ptr<perfetto::TracingSession> session;
     juce::File traceFile;
     juce::TimedCallback fileWriterCallback;
+
+    static void registerGlobalEventTrack()
+    {
+        auto track = perfetto::Track (melatoninGlobalEventTrackId);
+        auto desc = track.Serialize();
+        desc.set_name ("Global Events");
+        perfetto::TrackEvent::SetTrackDescriptor (track, desc);
+    }
 
     juce::File writeFile()
     {
@@ -298,10 +315,17 @@ namespace melatonin
 
     #define TRACE_DSP_BEGIN(name) TRACE_EVENT_BEGIN ("dsp", perfetto::StaticString (name))
     #define TRACE_DSP_END() TRACE_EVENT_END ("dsp")
+
+    /**
+     * Tracks an instant event, which shows up as an arrow on a separate "Global Events" track in the Perfetto UI.
+     * @param name Describe the event - this is what shows up in the trace.
+     */
+    #define TRACE_DSP_GLOBAL_INSTANT(name) TRACE_GLOBAL_INSTANT ("dsp", perfetto::StaticString (name))
 #else
     #define TRACE_DSP(...)
     #define TRACE_DSP_BEGIN(name)
     #define TRACE_DSP_END()
+    #define TRACE_DSP_GLOBAL_INSTANT(name)
 #endif
 
 #if PERFETTO_ENABLE_TRACE_COMPONENT
@@ -315,4 +339,10 @@ namespace melatonin
     #define TRACE_COMPONENT(...)
     #define TRACE_COMPONENT_BEGIN(name)
     #define TRACE_COMPONENT_END()
+
+    /**
+     * Tracks an instant event, which shows up as an arrow on a separate "Global Events" track in the Perfetto UI.
+     * @param name Describe the event - this is what shows up in the trace.
+     */
+    #define TRACE_COMPONENT_GLOBAL_INSTANT(name) TRACE_GLOBAL_INSTANT ("component", perfetto::StaticString (name))
 #endif
