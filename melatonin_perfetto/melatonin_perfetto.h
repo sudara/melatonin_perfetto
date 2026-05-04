@@ -7,7 +7,7 @@ BEGIN_JUCE_MODULE_DECLARATION
  name:               Melatonin Perfetto
  description:        Perfetto module for JUCE
  license:            MIT
- dependencies:       juce_core
+ dependencies:       juce_events
  minimumCppStandard: 17
 
 END_JUCE_MODULE_DECLARATION
@@ -34,7 +34,8 @@ END_JUCE_MODULE_DECLARATION
 
     #include <chrono>
     #include <fstream>
-    #include <juce_core/juce_core.h>
+    #include <future>
+    #include <juce_events/juce_events.h>
     #include <perfetto.h>
     #include <thread>
 
@@ -47,7 +48,17 @@ PERFETTO_DEFINE_CATEGORIES (
 class MelatoninPerfetto
 {
 public:
-    explicit MelatoninPerfetto (const bool startTrace = true) : startTraceAutomatically (startTrace)
+    explicit MelatoninPerfetto (const bool startTrace = true, juce::String filePrefix = "perfetto", juce::String fileSuffix = ".pftrace")
+        : startTraceAutomatically (startTrace),
+          prefix (filePrefix),
+          suffix (fileSuffix),
+          fileWriterCallback ([this] {
+              session->FlushBlocking();
+              session->ReadTrace ([&] (auto args) {
+                  if (!traceFile.appendData (args.data, args.size))
+                      DBG ("Failed to append perfetto trace data.");
+              });
+          })
     {
         perfetto::TracingInitArgs args;
         // The backends determine where trace events are recorded. For this example we
@@ -76,6 +87,9 @@ public:
         session->Setup (cfg);
         session->StartBlocking();
         started = true;
+
+        traceFile = getNewFile();
+        fileWriterCallback.startTimerHz (1);
     }
 
     // Returns the file where the dump was written to (or a null file if an error occurred)
@@ -85,10 +99,23 @@ public:
         // Make sure the last event is closed for this example.
         perfetto::TrackEvent::Flush();
 
-        // Stop tracing
+        fileWriterCallback.stopTimer();
         session->StopBlocking();
         started = false;
-        return writeFile();
+
+        // Block until the final trace data is fully written.
+        std::promise<void> writeDone;
+        session->ReadTrace ([&] (auto args) {
+            if (!traceFile.appendData (args.data, args.size))
+                DBG ("Failed to append perfetto trace data.");
+
+            if (!args.has_more)
+                writeDone.set_value();
+        });
+
+        writeDone.get_future().wait();
+
+        return traceFile;
     }
 
     static juce::File getDumpFileDirectory()
@@ -106,12 +133,36 @@ public:
 private:
     bool startTraceAutomatically;
     bool started = false;
+    juce::String prefix;
+    juce::String suffix;
+    std::unique_ptr<perfetto::TracingSession> session;
+    juce::File traceFile;
+    juce::TimedCallback fileWriterCallback;
+
     juce::File writeFile()
     {
         // Read trace data
         std::vector<char> trace_data (session->ReadTraceBlocking());
+        const auto file = getNewFile();
 
-        const auto file = getDumpFileDirectory();
+        if (auto output = file.createOutputStream())
+        {
+            output->setPosition (0);
+            output->write (&trace_data[0], trace_data.size() * sizeof (char));
+
+            DBG ("Wrote perfetto trace to: " + file.getFullPathName());
+
+            return file;
+        }
+
+        DBG ("Failed to write perfetto trace file. Check for missing permissions.");
+        jassertfalse;
+        return juce::File {};
+    }
+
+    [[nodiscard]] juce::File getNewFile() const
+    {
+        const auto directory = getDumpFileDirectory();
 
     #if JUCE_DEBUG
         auto mode = juce::String ("-DEBUG-");
@@ -120,24 +171,9 @@ private:
     #endif
 
         const auto currentTime = juce::Time::getCurrentTime().formatted ("%Y-%m-%d_%H%M");
-        const auto childFile = file.getChildFile ("perfetto" + mode + currentTime + ".pftrace");
-
-        if (auto output = childFile.createOutputStream())
-        {
-            output->setPosition (0);
-            output->write (&trace_data[0], trace_data.size() * sizeof (char));
-
-            DBG ("Wrote perfetto trace to: " + childFile.getFullPathName());
-
-            return childFile;
-        }
-
-        DBG ("Failed to write perfetto trace file. Check for missing permissions.");
-        jassertfalse;
-        return juce::File {};
+        const auto childFile = directory.getNonexistentChildFile (prefix + mode + currentTime, suffix);
+        return childFile;
     }
-
-    std::unique_ptr<perfetto::TracingSession> session;
 };
 
 /*
@@ -162,7 +198,6 @@ namespace melatonin
     // https://accu.org/journals/overload/30/172/wu/#_idTextAnchor004
     #define WRAP_COMPILE_TIME_STRING(x) [] { return (x); }
     #define UNWRAP_COMPILE_TIME_STRING(x) (x)()
-
     template <typename CompileTimeLambdaWrappedString>
     constexpr auto compileTimePrettierFunction (CompileTimeLambdaWrappedString wrappedSrc)
     {
