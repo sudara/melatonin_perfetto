@@ -54,14 +54,15 @@ if (WIN32)
 endif()
 
 if (MSVC)
-    target_compile_options(perfetto
-        PRIVATE
-            /bigobj # only needed for compilation of perfetto itself
-        PUBLIC
-            /Zc:__cplusplus # we need the correct value of the __cplusplus macro
-            /Zc:preprocessor # needed for __VA_OPT__(,) support
-            /permissive- # see https://github.com/google/perfetto/issues/214
-        )
+    target_compile_options(perfetto PRIVATE /bigobj)
+    if (CMAKE_CXX_COMPILER_FRONTEND_VARIANT STREQUAL "MSVC")
+        target_compile_options(perfetto
+            PUBLIC
+                /Zc:__cplusplus
+                /Zc:preprocessor # needed for __VA_OPT__(,) support
+                /permissive- # see https://github.com/google/perfetto/issues/214
+            )
+    endif ()
 endif ()
 
 add_library(perfetto::perfetto ALIAS perfetto)
