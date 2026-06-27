@@ -32,6 +32,12 @@ END_JUCE_MODULE_DECLARATION
         #define PERFETTO_ENABLE_TRACE_COMPONENT 1
     #endif
 
+    // When on, TRACE_DSP_PUBLIC ships its chosen public label instead of the real function name,
+    // so shipped binaries don't leak DSP architecture. Readable builds keep the real name.
+    #ifndef PERFETTO_OBFUSCATE_DSP
+        #define PERFETTO_OBFUSCATE_DSP 0
+    #endif
+
     #include <chrono>
     #include <fstream>
     #include <juce_core/juce_core.h>
@@ -263,10 +269,30 @@ namespace melatonin
 
     #define TRACE_DSP_BEGIN(name) TRACE_EVENT_BEGIN ("dsp", perfetto::StaticString (name))
     #define TRACE_DSP_END() TRACE_EVENT_END ("dsp")
+
+    // Ship a chosen public label instead of the real function name. Readable builds trace the
+    // real auto-derived name (for local profiling); obfuscated (shipped) builds trace publicName.
+    // publicName is a literal in your source, so a trace slice is trivial to grep back to its call
+    // site, while the real name never lands in the binary and there's no decode map to keep.
+    #define MELATONIN_PF_CONCAT_(a, b) a##b
+    #define MELATONIN_PF_CONCAT(a, b) MELATONIN_PF_CONCAT_ (a, b)
+    // unique per call site so several TRACE_DSP_PUBLIC can share one function scope (sub-regions)
+    #define MELATONIN_PF MELATONIN_PF_CONCAT (melatoninTracePf_, __LINE__)
+    #if PERFETTO_OBFUSCATE_DSP
+        #define TRACE_DSP_PUBLIC(publicName, ...) TRACE_EVENT ("dsp", perfetto::StaticString (publicName) __VA_OPT__(,) __VA_ARGS__)
+        #define TRACE_DSP_BEGIN_PUBLIC(debugName, publicName, ...) TRACE_EVENT_BEGIN ("dsp", perfetto::StaticString (publicName) __VA_OPT__(,) __VA_ARGS__)
+    #else
+        #define TRACE_DSP_PUBLIC(publicName, ...)                                                                                         \
+            static constexpr auto MELATONIN_PF = melatonin::compileTimePrettierFunction (WRAP_COMPILE_TIME_STRING (PERFETTO_DEBUG_FUNCTION_IDENTIFIER())); \
+            TRACE_EVENT ("dsp", perfetto::StaticString (MELATONIN_PF.data()) __VA_OPT__(,) __VA_ARGS__)
+        #define TRACE_DSP_BEGIN_PUBLIC(debugName, publicName, ...) TRACE_EVENT_BEGIN ("dsp", perfetto::StaticString (debugName) __VA_OPT__(,) __VA_ARGS__)
+    #endif
 #else
     #define TRACE_DSP(...)
     #define TRACE_DSP_BEGIN(name)
     #define TRACE_DSP_END()
+    #define TRACE_DSP_PUBLIC(publicName, ...)
+    #define TRACE_DSP_BEGIN_PUBLIC(debugName, publicName, ...)
 #endif
 
 #if PERFETTO_ENABLE_TRACE_COMPONENT
