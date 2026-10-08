@@ -162,27 +162,6 @@ private:
         perfetto::TrackEvent::SetTrackDescriptor (track, desc);
     }
 
-    juce::File writeFile()
-    {
-        // Read trace data
-        std::vector<char> trace_data (session->ReadTraceBlocking());
-        const auto file = getNewFile();
-
-        if (auto output = file.createOutputStream())
-        {
-            output->setPosition (0);
-            output->write (&trace_data[0], trace_data.size() * sizeof (char));
-
-            DBG ("Wrote perfetto trace to: " + file.getFullPathName());
-
-            return file;
-        }
-
-        DBG ("Failed to write perfetto trace file. Check for missing permissions.");
-        jassertfalse;
-        return juce::File {};
-    }
-
     [[nodiscard]] juce::File getNewFile() const
     {
         const auto directory = getDumpFileDirectory();
