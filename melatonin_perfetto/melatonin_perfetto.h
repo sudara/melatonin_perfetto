@@ -7,7 +7,7 @@ BEGIN_JUCE_MODULE_DECLARATION
  name:               Melatonin Perfetto
  description:        Perfetto module for JUCE
  license:            MIT
- dependencies:       juce_events
+ dependencies:       juce_core
  minimumCppStandard: 17
 
 END_JUCE_MODULE_DECLARATION
@@ -40,10 +40,8 @@ END_JUCE_MODULE_DECLARATION
 
     #include <chrono>
     #include <fstream>
-    #include <future>
-    #include <juce_events/juce_events.h>
+    #include <juce_core/juce_core.h>
     #include <perfetto.h>
-    #include <thread>
 
 PERFETTO_DEFINE_CATEGORIES (
     perfetto::Category ("component")
@@ -65,19 +63,16 @@ public:
     explicit MelatoninPerfetto (const bool startTrace = true, juce::String filePrefix = "perfetto", juce::String fileSuffix = ".pftrace")
         : startTraceAutomatically (startTrace),
           prefix (filePrefix),
-          suffix (fileSuffix),
-          fileWriterCallback ([this] {
-              session->FlushBlocking();
-              session->ReadTrace ([&] (auto args) {
-                  if (!traceFile.appendData (args.data, args.size))
-                      DBG ("Failed to append perfetto trace data.");
-              });
-          })
+          suffix (fileSuffix)
     {
         perfetto::TracingInitArgs args;
         // The backends determine where trace events are recorded. For this example we
         // are going to use the in-process tracing service, which only includes in-app events.
         args.backends = perfetto::kInProcessBackend;
+
+        // Traces are first written to a smaller, intermediate buffer, which defaults to 256KB. It's easy to overflow the buffer
+        // if you have many traces per audio block. This sets the size of that buffer to a more comfortable 16MB.
+        args.shmem_size_hint_kb = 16 * 1024;
         perfetto::Tracing::Initialize (args);
         perfetto::TrackEvent::Register();
         registerGlobalEventTrack();
@@ -96,40 +91,28 @@ public:
     {
         perfetto::TraceConfig cfg;
         cfg.add_buffers()->set_size_kb (buffer_size_kb); // 80MB is the default
+
+        traceFile = getNewFile();
+        cfg.set_write_into_file (true);
+        cfg.set_file_write_period_ms (1000);
+        cfg.set_flush_period_ms (5000);
+        cfg.set_output_path (traceFile.getFullPathName().toStdString());
+
         auto* ds_cfg = cfg.add_data_sources()->mutable_config();
         ds_cfg->set_name ("track_event");
         session = perfetto::Tracing::NewTrace();
         session->Setup (cfg);
         session->StartBlocking();
         started = true;
-
-        traceFile = getNewFile();
-        fileWriterCallback.startTimerHz (1);
     }
 
     // Returns the file where the dump was written to (or a null file if an error occurred)
     // the return value can be ignored if you don't need this information
     juce::File endSession()
     {
-        // Make sure the last event is closed for this example.
-        perfetto::TrackEvent::Flush();
-
-        fileWriterCallback.stopTimer();
+        session->FlushBlocking();
         session->StopBlocking();
         started = false;
-
-        // Block until the final trace data is fully written.
-        std::promise<void> writeDone;
-        session->ReadTrace ([&] (auto args) {
-            if (!traceFile.appendData (args.data, args.size))
-                DBG ("Failed to append perfetto trace data.");
-
-            if (!args.has_more)
-                writeDone.set_value();
-        });
-
-        writeDone.get_future().wait();
-
         return traceFile;
     }
 
@@ -152,7 +135,6 @@ private:
     juce::String suffix;
     std::unique_ptr<perfetto::TracingSession> session;
     juce::File traceFile;
-    juce::TimedCallback fileWriterCallback;
 
     static void registerGlobalEventTrack()
     {
