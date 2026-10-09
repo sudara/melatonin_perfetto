@@ -49,13 +49,10 @@ PERFETTO_DEFINE_CATEGORIES (
     perfetto::Category ("dsp")
         .SetDescription ("dsp"));
 
-static constexpr std::uint64_t melatoninGlobalEventTrackId = 0xE1A70515;
-
-    /**
-     * Tracks an instant event, which shows up as an arrow on a separate "Global Events" track in the Perfetto UI.
-     * @param name Describe the event - this is what shows up in the trace.
-     */
-    #define TRACE_GLOBAL_INSTANT(cat, desc) TRACE_EVENT_INSTANT (cat, desc, perfetto::Track (melatoninGlobalEventTrackId));
+namespace melatonin
+{
+    static constexpr std::uint64_t melatoninGlobalEventTrackId = 0xE1A70515;
+}
 
 class MelatoninPerfetto
 {
@@ -138,7 +135,7 @@ private:
 
     static void registerGlobalEventTrack()
     {
-        auto track = perfetto::Track (melatoninGlobalEventTrackId);
+        auto track = perfetto::Track (melatonin::melatoninGlobalEventTrackId);
         auto desc = track.Serialize();
         desc.set_name ("Global Events");
         perfetto::TrackEvent::SetTrackDescriptor (track, desc);
@@ -262,11 +259,19 @@ namespace melatonin
     }
 }
 
+    /**
+      * Tracks an instant event, which shows up as an arrow on a separate "Global Events" track in the Perfetto UI.
+      * @param cat The name of the category.
+      * @param desc Describe the event - this is what shows up in the trace.
+      */
+    #define TRACE_GLOBAL_INSTANT(cat, desc) TRACE_EVENT_INSTANT (cat, desc, perfetto::Track (melatonin::melatoninGlobalEventTrackId))
+
 #else
 // allow people to keep perfetto helpers in-place even when disabled
     #define TRACE_EVENT_BEGIN(category, ...)
     #define TRACE_EVENT_END(category)
     #define TRACE_EVENT(category, ...)
+    #define TRACE_GLOBAL_INSTANT(category, ...)
 #endif
 
 // Et voilà! Our nicer macros.
