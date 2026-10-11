@@ -42,7 +42,6 @@ END_JUCE_MODULE_DECLARATION
     #include <fstream>
     #include <juce_core/juce_core.h>
     #include <perfetto.h>
-    #include <thread>
 
 PERFETTO_DEFINE_CATEGORIES (
     perfetto::Category ("component")
@@ -50,17 +49,30 @@ PERFETTO_DEFINE_CATEGORIES (
     perfetto::Category ("dsp")
         .SetDescription ("dsp"));
 
+namespace melatonin
+{
+    static constexpr std::uint64_t melatoninGlobalEventTrackId = 0xE1A70515;
+}
+
 class MelatoninPerfetto
 {
 public:
-    explicit MelatoninPerfetto (const bool startTrace = true) : startTraceAutomatically (startTrace)
+    explicit MelatoninPerfetto (const bool startTrace = true, juce::String filePrefix = "perfetto", juce::String fileSuffix = ".pftrace")
+        : startTraceAutomatically (startTrace),
+          prefix (filePrefix),
+          suffix (fileSuffix)
     {
         perfetto::TracingInitArgs args;
         // The backends determine where trace events are recorded. For this example we
         // are going to use the in-process tracing service, which only includes in-app events.
         args.backends = perfetto::kInProcessBackend;
+
+        // Traces are first written to a smaller, intermediate buffer, which defaults to 256KB. It's easy to overflow the buffer
+        // if you have many traces per audio block. This sets the size of that buffer to a more comfortable 16MB.
+        args.shmem_size_hint_kb = 16 * 1024;
         perfetto::Tracing::Initialize (args);
         perfetto::TrackEvent::Register();
+        registerGlobalEventTrack();
 
         if (startTraceAutomatically)
             beginSession();
@@ -76,6 +88,13 @@ public:
     {
         perfetto::TraceConfig cfg;
         cfg.add_buffers()->set_size_kb (buffer_size_kb); // 80MB is the default
+
+        traceFile = getNewFile();
+        cfg.set_write_into_file (true);
+        cfg.set_file_write_period_ms (1000);
+        cfg.set_flush_period_ms (5000);
+        cfg.set_output_path (traceFile.getFullPathName().toStdString());
+
         auto* ds_cfg = cfg.add_data_sources()->mutable_config();
         ds_cfg->set_name ("track_event");
         session = perfetto::Tracing::NewTrace();
@@ -88,13 +107,10 @@ public:
     // the return value can be ignored if you don't need this information
     juce::File endSession()
     {
-        // Make sure the last event is closed for this example.
-        perfetto::TrackEvent::Flush();
-
-        // Stop tracing
+        session->FlushBlocking();
         session->StopBlocking();
         started = false;
-        return writeFile();
+        return traceFile;
     }
 
     static juce::File getDumpFileDirectory()
@@ -115,12 +131,22 @@ public:
 private:
     bool startTraceAutomatically;
     bool started = false;
-    juce::File writeFile()
-    {
-        // Read trace data
-        std::vector<char> trace_data (session->ReadTraceBlocking());
+    juce::String prefix;
+    juce::String suffix;
+    std::unique_ptr<perfetto::TracingSession> session;
+    juce::File traceFile;
 
-        const auto file = getDumpFileDirectory();
+    static void registerGlobalEventTrack()
+    {
+        auto track = perfetto::Track (melatonin::melatoninGlobalEventTrackId);
+        auto desc = track.Serialize();
+        desc.set_name ("Global Events");
+        perfetto::TrackEvent::SetTrackDescriptor (track, desc);
+    }
+
+    [[nodiscard]] juce::File getNewFile() const
+    {
+        const auto directory = getDumpFileDirectory();
 
     #if JUCE_DEBUG
         auto mode = juce::String ("-DEBUG-");
@@ -129,24 +155,9 @@ private:
     #endif
 
         const auto currentTime = juce::Time::getCurrentTime().formatted ("%Y-%m-%d_%H%M");
-        const auto childFile = file.getChildFile ("perfetto" + mode + currentTime + ".pftrace");
-
-        if (auto output = childFile.createOutputStream())
-        {
-            output->setPosition (0);
-            output->write (&trace_data[0], trace_data.size() * sizeof (char));
-
-            DBG ("Wrote perfetto trace to: " + childFile.getFullPathName());
-
-            return childFile;
-        }
-
-        DBG ("Failed to write perfetto trace file. Check for missing permissions.");
-        jassertfalse;
-        return juce::File {};
+        const auto childFile = directory.getNonexistentChildFile (prefix + mode + currentTime, suffix);
+        return childFile;
     }
-
-    std::unique_ptr<perfetto::TracingSession> session;
 };
 
 /*
@@ -171,7 +182,6 @@ namespace melatonin
     // https://accu.org/journals/overload/30/172/wu/#_idTextAnchor004
     #define WRAP_COMPILE_TIME_STRING(x) [] { return (x); }
     #define UNWRAP_COMPILE_TIME_STRING(x) (x)()
-
     template <typename CompileTimeLambdaWrappedString>
     constexpr auto compileTimePrettierFunction (CompileTimeLambdaWrappedString wrappedSrc)
     {
@@ -252,11 +262,19 @@ namespace melatonin
     }
 }
 
+    /**
+      * Tracks an instant event, which shows up as an arrow on a separate "Global Events" track in the Perfetto UI.
+      * @param cat The name of the category.
+      * @param desc Describe the event - this is what shows up in the trace.
+      */
+    #define TRACE_GLOBAL_INSTANT(cat, desc) TRACE_EVENT_INSTANT (cat, desc, perfetto::Track (melatonin::melatoninGlobalEventTrackId))
+
 #else
 // allow people to keep perfetto helpers in-place even when disabled
     #define TRACE_EVENT_BEGIN(category, ...)
     #define TRACE_EVENT_END(category)
     #define TRACE_EVENT(category, ...)
+    #define TRACE_GLOBAL_INSTANT(category, ...)
 #endif
 
 // Et voilà! Our nicer macros.
@@ -266,9 +284,9 @@ namespace melatonin
 
 // we also can toggle dsp/component on/off individually to help clean up traces
 #if PERFETTO_ENABLE_TRACE_DSP
-    #define TRACE_DSP(...)                                                                                                            \
+    #define TRACE_DSP(...)                                                                                                                   \
         static constexpr auto pf = melatonin::compileTimePrettierFunction (WRAP_COMPILE_TIME_STRING (PERFETTO_DEBUG_FUNCTION_IDENTIFIER())); \
-        TRACE_EVENT ("dsp", perfetto::StaticString (pf.data()) __VA_OPT__(,) __VA_ARGS__)
+        TRACE_EVENT ("dsp", perfetto::StaticString (pf.data()) __VA_OPT__ (, ) __VA_ARGS__)
 
     #define TRACE_DSP_BEGIN(name) TRACE_EVENT_BEGIN ("dsp", perfetto::StaticString (name))
     #define TRACE_DSP_END() TRACE_EVENT_END ("dsp")
@@ -290,23 +308,37 @@ namespace melatonin
             TRACE_EVENT ("dsp", perfetto::StaticString (MELATONIN_PF.data()) __VA_OPT__(,) __VA_ARGS__)
         #define TRACE_DSP_BEGIN_PUBLIC(debugName, publicName, ...) TRACE_EVENT_BEGIN ("dsp", perfetto::StaticString (debugName) __VA_OPT__(,) __VA_ARGS__)
     #endif
+
+    /**
+     * Tracks an instant event, which shows up as an arrow on a separate "Global Events" track in the Perfetto UI.
+     * @param name Describe the event - this is what shows up in the trace.
+     */
+    #define TRACE_DSP_GLOBAL_INSTANT(name) TRACE_GLOBAL_INSTANT ("dsp", perfetto::StaticString (name))
 #else
     #define TRACE_DSP(...)
     #define TRACE_DSP_BEGIN(name)
     #define TRACE_DSP_END()
     #define TRACE_DSP_PUBLIC(publicName, ...)
     #define TRACE_DSP_BEGIN_PUBLIC(debugName, publicName, ...)
+    #define TRACE_DSP_GLOBAL_INSTANT(name)
 #endif
 
 #if PERFETTO_ENABLE_TRACE_COMPONENT
-    #define TRACE_COMPONENT(...)                                                                                                      \
+    #define TRACE_COMPONENT(...)                                                                                                             \
         static constexpr auto pf = melatonin::compileTimePrettierFunction (WRAP_COMPILE_TIME_STRING (PERFETTO_DEBUG_FUNCTION_IDENTIFIER())); \
-        TRACE_EVENT ("component", perfetto::StaticString (pf.data()) __VA_OPT__(,) __VA_ARGS__)
+        TRACE_EVENT ("component", perfetto::StaticString (pf.data()) __VA_OPT__ (, ) __VA_ARGS__)
 
     #define TRACE_COMPONENT_BEGIN(name) TRACE_EVENT_BEGIN ("component", perfetto::StaticString (name))
     #define TRACE_COMPONENT_END() TRACE_EVENT_END ("component")
+
+    /**
+     * Tracks an instant event, which shows up as an arrow on a separate "Global Events" track in the Perfetto UI.
+     * @param name Describe the event - this is what shows up in the trace.
+     */
+    #define TRACE_COMPONENT_GLOBAL_INSTANT(name) TRACE_GLOBAL_INSTANT ("component", perfetto::StaticString (name))
 #else
     #define TRACE_COMPONENT(...)
     #define TRACE_COMPONENT_BEGIN(name)
     #define TRACE_COMPONENT_END()
+    #define TRACE_COMPONENT_GLOBAL_INSTANT(name)
 #endif
