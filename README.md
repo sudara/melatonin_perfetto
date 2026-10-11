@@ -330,7 +330,7 @@ Go wild!
 
 ## Assumptions / Caveats
 
-* On Mac, the trace is dumped to your Downloads folder. On Windows, it's dumped to your Desktop. On Linux, it's dumped to the temp directory (`/tmp`).
+* On Mac, the trace is dumped to your Downloads folder. On Windows, it's dumped to your Desktop. On Linux, it's dumped to the temp directory (`/tmp`). On iOS, it goes to the app's Documents folder, which the Files app (and Finder) shows when `UIFileSharingEnabled` is set, and which Xcode's Devices window can download either way.
 * Traces are set to in memory, 80MB by default.
 
 ## Troubleshooting

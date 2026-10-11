@@ -101,8 +101,11 @@ public:
     {
     #if JUCE_WINDOWS
         return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDesktopDirectory);
-    #elif JUCE_MAC || JUCE_IOS
+    #elif JUCE_MAC
         return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userHomeDirectory).getChildFile ("Downloads");
+    #elif JUCE_IOS
+        // the Files app shows Documents when UIFileSharingEnabled is set
+        return juce::File::getSpecialLocation (juce::File::SpecialLocationType::userDocumentsDirectory);
     #else
         // Linux: use temp directory for CI compatibility (no desktop/Downloads on headless systems)
         return juce::File::getSpecialLocation (juce::File::SpecialLocationType::tempDirectory);
